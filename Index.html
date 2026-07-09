@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<!-- saved from url=(0045)file:///C:/Users/rowan/Downloads/index_2.html -->
+<html lang="nl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="3D4U ERP">
+<title>3D4U ERP</title>
+<style>
+:root{
+  --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a; --line2:#363c49;
+  --txt:#e7eaf0; --mut:#9aa3b2; --mut2:#6b7383;
+  --acc:#ff7a1a; --acc2:#ffa257; --accbg:#2a1c10;
+  --ok:#3ecf8e; --okbg:#12271d; --warn:#f5b642; --warnbg:#2a2210; --err:#ff5c5c; --errbg:#2a1414;
+  --blue:#4c8dff; --bluebg:#101d33; --purple:#9b7bff;
+  --radius:10px; --radius2:7px;
+  --fs:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--txt);font:var(--fs)/1.45 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:inherit}
+a{color:var(--acc2)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:6px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ---------- Layout ---------- */
+#app{display:flex;min-height:100vh}
+#sidebar{width:230px;flex:0 0 230px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{padding:18px 18px 14px;border-bottom:1px solid var(--line)}
+.brand .logo{font-weight:800;font-size:20px;letter-spacing:.5px}
+.brand .logo span{color:var(--acc)}
+.brand .sub{color:var(--mut2);font-size:11px;margin-top:2px;text-transform:uppercase;letter-spacing:1px}
+.nav{padding:8px;overflow:auto;flex:1}
+.nav .grp{color:var(--mut2);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:12px 10px 5px}
+.nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius2);color:var(--mut);text-decoration:none;margin:1px 0;font-weight:500}
+.nav a .ic{width:18px;text-align:center;opacity:.85}
+.nav a:hover{background:var(--panel2);color:var(--txt)}
+.nav a.active{background:var(--accbg);color:var(--acc2)}
+.nav a .badge{margin-left:auto;background:var(--line2);color:var(--txt);border-radius:20px;font-size:11px;padding:0 7px;min-width:20px;text-align:center}
+.nav a.active .badge{background:var(--acc);color:#160c02}
+.savebar{padding:10px 12px;border-top:1px solid var(--line);font-size:11px;color:var(--mut2);display:flex;align-items:center;gap:8px}
+.savedot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.savedot.dirty{background:var(--warn);box-shadow:0 0 8px var(--warn)}
+
+#main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(15,17,21,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 26px;display:flex;align-items:center;gap:14px}
+.topbar h1{font-size:19px;margin:0;font-weight:700}
+.topbar .crumb{color:var(--mut2);font-size:12px}
+.topbar .sp{flex:1}
+.content{padding:22px 26px 60px;max-width:1300px;width:100%}
+
+/* ---------- Components ---------- */
+.btn{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);padding:8px 14px;border-radius:var(--radius2);font-weight:600;display:inline-flex;align-items:center;gap:7px;transition:.12s}
+.btn:hover{border-color:var(--mut2);background:#242935}
+.btn.pri{background:var(--acc);color:#160c02;border-color:var(--acc)}
+.btn.pri:hover{background:var(--acc2)}
+.btn.ghost{background:transparent;border-color:var(--line)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn.danger{color:var(--err);border-color:#4a2626}
+.btn.danger:hover{background:var(--errbg)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden}
+.kpi .lbl{color:var(--mut2);font-size:11px;text-transform:uppercase;letter-spacing:.8px}
+.kpi .val{font-size:26px;font-weight:800;margin-top:6px;letter-spacing:-.5px}
+.kpi .foot{color:var(--mut);font-size:12px;margin-top:4px}
+.kpi .bar{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--acc)}
+.kpi.blue .bar{background:var(--blue)} .kpi.ok .bar{background:var(--ok)} .kpi.warn .bar{background:var(--warn)} .kpi.purple .bar{background:var(--purple)}
+
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.search{position:relative;flex:1;min-width:200px;max-width:380px}
+.search input{width:100%;background:var(--panel);border:1px solid var(--line2);border-radius:var(--radius2);padding:9px 12px 9px 34px;color:var(--txt)}
+.search .ic{position:absolute;left:11px;top:9px;color:var(--mut2)}
+.search input:focus{outline:none;border-color:var(--acc)}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+.tblwrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+thead th{text-align:left;background:var(--panel2);color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:.1s}
+tbody tr:hover{background:var(--panel2)}
+tbody tr.click{cursor:pointer}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.empty{padding:40px;text-align:center;color:var(--mut2)}
+
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;border:1px solid transparent;white-space:nowrap}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.gray{background:#20242e;color:var(--mut);border-color:var(--line2)}
+.pill.blue{background:var(--bluebg);color:#8bb4ff;border-color:#28406b}
+.pill.ok{background:var(--okbg);color:var(--ok);border-color:#1c4433}
+.pill.warn{background:var(--warnbg);color:var(--warn);border-color:#4a3c14}
+.pill.err{background:var(--errbg);color:var(--err);border-color:#4a2626}
+.pill.acc{background:var(--accbg);color:var(--acc2);border-color:#4a2f14}
+.pill.purple{background:#1c162e;color:#b79bff;border-color:#392a5e}
+
+/* forms / modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}
+.modal{background:var(--panel);border:1px solid var(--line2);border-radius:14px;width:100%;max-width:720px;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:pop .16s ease}
+.modal.wide{max-width:1040px}
+@keyframes pop{from{transform:translateY(10px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.modal .mh{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.modal .mh h3{margin:0;font-size:16px}
+.modal .mh .x{margin-left:auto;background:none;border:none;color:var(--mut);font-size:22px;line-height:1;padding:0 4px}
+.modal .mh .x:hover{color:var(--txt)}
+.modal .mb{padding:20px;max-height:70vh;overflow:auto}
+.modal .mf{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;align-items:center}
+
+.field{margin-bottom:14px}
+.field label{display:block;color:var(--mut);font-size:12px;margin-bottom:5px;font-weight:600}
+.field label .req{color:var(--acc)}
+.field input,.field select,.field textarea{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:var(--radius2);padding:9px 11px;color:var(--txt)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--acc)}
+.field input.err,.field select.err{border-color:var(--err)}
+.field .hint{color:var(--mut2);font-size:11px;margin-top:4px}
+.field textarea{resize:vertical;min-height:60px}
+.frow{display:grid;gap:14px}
+.frow.c2{grid-template-columns:1fr 1fr}.frow.c3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:640px){.frow.c2,.frow.c3{grid-template-columns:1fr}}
+.section-t{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mut2);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.section-t:first-child{margin-top:0}
+
+.calcbox{background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.calcrow{display:flex;justify-content:space-between;padding:4px 0;color:var(--mut)}
+.calcrow b{color:var(--txt);font-variant-numeric:tabular-nums}
+.calcrow.big{border-top:1px solid var(--line2);margin-top:6px;padding-top:8px;font-size:15px}
+.calcrow.big b{color:var(--acc2);font-size:17px}
+
+.toast{position:fixed;bottom:22px;right:22px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast .t{background:var(--panel2);border:1px solid var(--line2);border-left:4px solid var(--ok);padding:11px 16px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:slide .2s;min-width:220px}
+.toast .t.err{border-left-color:var(--err)} .toast .t.warn{border-left-color:var(--warn)}
+@keyframes slide{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+.mini{color:var(--mut2);font-size:12px}
+.tag{font-size:11px;color:var(--mut2);background:var(--panel2);border:1px solid var(--line);padding:1px 7px;border-radius:5px;font-variant-numeric:tabular-nums}
+.linkbtn{background:none;border:none;color:var(--acc2);padding:0;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.hl{color:var(--acc2);font-weight:700}
+.warnbox{background:var(--warnbg);border:1px solid #4a3c14;color:#f5cf8a;padding:10px 14px;border-radius:8px;font-size:13px;display:flex;gap:10px;align-items:flex-start}
+.okbox{background:var(--okbg);border:1px solid #1c4433;color:#8ee0b8;padding:10px 14px;border-radius:8px;font-size:13px}
+.detailhead{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.detailhead .big{font-size:22px;font-weight:800}
+.subgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kv{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+.kv .k{color:var(--mut2);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.kv .v{font-weight:600;margin-top:2px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.tabs button{background:none;border:none;color:var(--mut);padding:9px 14px;font-weight:600;border-bottom:2px solid transparent}
+.tabs button.active{color:var(--acc2);border-bottom-color:var(--acc)}
+
+/* ---------- hamburger / drawer (verborgen op desktop) ---------- */
+.menu-btn{display:none;background:var(--panel2);border:1px solid var(--line2);color:var(--txt);width:40px;height:40px;border-radius:var(--radius2);align-items:center;justify-content:center;font-size:20px;flex:0 0 auto}
+.menu-btn:active{background:#242935}
+.nav-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;backdrop-filter:blur(2px)}
+.nav-backdrop.show{display:block;animation:fade .15s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sidebar-close{display:none}
+
+/* ==================================================================
+   TELEFOON / TABLET  (≤ 820px)
+   ================================================================== */
+@media(max-width:820px){
+  :root{--fs:15px}
+  /* safe-area (notch) */
+  body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+
+  /* sidebar wordt uitschuifbaar paneel */
+  #sidebar{position:fixed;top:0;left:0;height:100%;height:100dvh;z-index:50;width:82vw;max-width:300px;
+    transform:translateX(-100%);transition:transform .22s ease;box-shadow:0 0 40px rgba(0,0,0,.6)}
+  #sidebar.open{transform:none}
+  .sidebar-close{display:block;margin-left:auto;background:none;border:none;color:var(--mut);font-size:24px;line-height:1;padding:0 4px}
+  .brand{display:flex;align-items:center;gap:4px;padding-top:calc(16px + env(safe-area-inset-top))}
+  .brand .logo{font-size:19px}
+  .nav a{padding:12px 12px;font-size:15px}          /* grotere tikdoelen */
+  .nav a .badge{font-size:12px;min-width:22px}
+
+  .menu-btn{display:inline-flex}
+
+  /* topbar compacter + sticky met safe-area */
+  .topbar{padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top));gap:10px}
+  .topbar h1{font-size:17px}
+  .topbar .crumb{font-size:11px}
+  #pageActions{gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  #pageActions .btn{padding:9px 12px}
+  .content{padding:16px 14px calc(80px + env(safe-area-inset-bottom))}
+
+  /* knoppen groter voor vingers */
+  .btn{padding:10px 14px;min-height:42px}
+  .btn.sm{min-height:34px;padding:7px 11px}
+
+  /* tabellen horizontaal scrollbaar i.p.v. afgeknepen */
+  .tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{font-size:13.5px}
+  thead th,tbody td{padding:11px 12px}
+  thead th{position:static}
+
+  /* toolbar/zoek full width */
+  .toolbar{gap:8px}
+  .search{max-width:none;min-width:0;flex:1 1 100%}
+  .search input{padding:11px 12px 11px 34px}
+
+  /* modal: bijna volledig scherm, footer plakt onderaan */
+  .overlay{padding:0;align-items:flex-end}
+  .modal{max-width:none;border-radius:16px 16px 0 0;max-height:94dvh;display:flex;flex-direction:column;animation:sheet .22s ease}
+  .modal.wide{max-width:none}
+  @keyframes sheet{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+  .modal .mh{padding:16px;padding-top:calc(14px + env(safe-area-inset-top,0px))}
+  .modal .mb{max-height:none;flex:1;padding:16px}
+  .modal .mf{padding:12px 16px calc(12px + env(safe-area-inset-bottom));flex-wrap:wrap;position:sticky;bottom:0;background:var(--panel)}
+  .modal .mf .btn{flex:1 1 auto;justify-content:center}
+
+  /* formulieren: alles onder elkaar, inputs 16px (voorkomt iOS-inzoomen) */
+  .frow.c2,.frow.c3{grid-template-columns:1fr}
+  .field input,.field select,.field textarea{font-size:16px;padding:11px 12px}
+
+  /* detail/tabs horizontaal scrollbaar */
+  .detailhead .big{font-size:19px}
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .tabs button{flex:0 0 auto}
+  .subgrid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+
+  /* toast onderin gecentreerd */
+  .toast{left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));align-items:stretch}
+  .toast .t{min-width:0}
+}
+
+/* kleine telefoons */
+@media(max-width:400px){
+  .topbar h1{font-size:16px}
+  .kpi .val{font-size:23px}
+  #pageActions .btn span.lbl{display:none}  /* toon alleen icoon bij actieknoppen indien gelabeld */
+}
+
+/* desktop: overlay nooit tonen (bij draaien vanaf mobiel) */
+@media(min-width:821px){.nav-backdrop{display:none!important}}
+
+/* apparaten met touch: geen hover-flikker, ruimere rijen */
+@media(hover:none){
+  tbody tr:hover{background:inherit}
+  tbody tr.click:active{background:var(--panel2)}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="brand">
+      <div>
+        <div class="logo">3D4U<span>·</span>ERP</div>
+        <div class="sub">Printservice besturing</div>
+      </div>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Menu sluiten">×</button>
+    </div>
+    <nav class="nav" id="nav"><div class="grp">Overzicht</div><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class="active"><span class="ic">▦</span><span>Dashboard</span></a><div class="grp">Beheer (formulieren)</div><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class=""><span class="ic">◉</span><span>Klanten</span><span class="badge">1</span></a><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class=""><span class="ic">◈</span><span>Producten</span><span class="badge">1</span></a><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class=""><span class="ic">▤</span><span>Materialen</span><span class="badge">32</span></a><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class=""><span class="ic">↧</span><span>Materiaalinkoop</span></a><div class="grp">Projecten &amp; documenten</div><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class=""><span class="ic">▣</span><span>Projecten</span></a><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class=""><span class="ic">◧</span><span>Offertes</span></a><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class=""><span class="ic">⧉</span><span>Pakbonnen</span></a><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class=""><span class="ic">€</span><span>Facturen</span></a><div class="grp">Systeem</div><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class=""><span class="ic">⚙</span><span>Instellingen</span></a><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class=""><span class="ic">⤓</span><span>Back-up &amp; data</span></a><a href="file:///C:/Users/rowan/Downloads/index_2.html#" class=""><span class="ic">≡</span><span>Logboek</span></a></nav>
+    <div class="savebar">
+      <span class="savedot" id="savedot"></span>
+      <span id="savetxt">Opgeslagen 07:05</span>
+    </div>
+  </aside>
+  <div id="main">
+    <div class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu openen">☰</button>
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="crumb" id="pageCrumb"></div>
+      </div>
+      <div class="sp"></div>
+      <div id="pageActions" style="display:flex;gap:10px"><button class="btn pri">+ Nieuw project</button></div>
+    </div>
+    <div class="content" id="content"><div class="grid g4" style="margin-bottom:18px"><div class="kpi "><div class="bar"></div><div class="lbl">Lopende projecten</div><div class="val">0</div><div class="foot">0 in productie</div></div><div class="kpi blue"><div class="bar"></div><div class="lbl">Openstaande offertes</div><div class="val">0</div><div class="foot">€ 0 in afwachting</div></div><div class="kpi warn"><div class="bar"></div><div class="lbl">Openstaande facturen</div><div class="val">0</div><div class="foot">€ 0 te ontvangen</div></div><div class="kpi ok"><div class="bar"></div><div class="lbl">Omzet 2026</div><div class="val">€ 0</div><div class="foot">€ 0 deze maand</div></div></div><div class="grid g2"><div class="card"><div class="section-t">Waarschuwingen</div><div class="warnbox" style="margin-bottom:8px"><span>⚠</span><span>Ontbrekende contactgegevens: Pieter</span></div></div><div class="card"><div class="section-t">Recente projecten</div><div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)" class="click"><div style="flex:1"><div style="font-weight:600">262606</div><div class="mini">2679PTR · Pieter</div></div><div class="tag">€ 140</div><div><span class="pill ok"><span class="dot"></span>Afgerond</span></div></div></div></div><div class="card" style="margin-top:16px"><div class="section-t">Topklanten (omzet dit jaar)</div><div class="mini">Nog geen gefactureerde omzet dit jaar.</div></div></div>
+  </div>
+</div>
+<div class="nav-backdrop" id="navBackdrop"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==========================================================================
+   3D4U ERP — offline, single-file. Data in IndexedDB + back-up naar bestand.
+   ========================================================================== */
+"use strict";
+
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const el=(t,a={},...ch)=>{const e=document.createElement(t);for(const k in a){if(k==="class")e.className=a[k];else if(k==="html")e.innerHTML=a[k];else if(k.startsWith("on")&&typeof a[k]==="function")e.addEventListener(k.slice(2),a[k]);else if(a[k]!=null)e.setAttribute(k,a[k]);}for(let c of ch.flat()){if(c==null)continue;e.append(c.nodeType?c:document.createTextNode(c));}return e;};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const eur=n=>"€ "+(Number(n)||0).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});
+const eur0=n=>"€ "+Math.round(Number(n)||0).toLocaleString("nl-NL");
+const num=(n,d=2)=>(Number(n)||0).toLocaleString("nl-NL",{minimumFractionDigits:d,maximumFractionDigits:d});
+const today=()=>new Date().toISOString().slice(0,10);
+const fdate=d=>{if(!d)return"—";const x=new Date(d);return isNaN(x)?d:x.toLocaleDateString("nl-NL",{day:"2-digit",month:"short",year:"numeric"});};
+const addDays=(d,n)=>{const x=new Date(d||today());x.setDate(x.getDate()+n);return x.toISOString().slice(0,10);};
+const parseNum=v=>{if(v==null||v==="")return 0;return parseFloat(String(v).replace(",","."))||0;};
+function toast(msg,type=""){const t=el("div",{class:"t "+type},msg);$("#toast").append(t);setTimeout(()=>{t.style.opacity="0";t.style.transition=".3s";setTimeout(()=>t.remove(),300);},2600);}
+</script>
+<script>
+/* ==========================================================================
+   DATALAAG — IndexedDB (primair) + roterende back-ups + bestand-koppeling
+   ========================================================================== */
+const DB_NAME="erp3d4u_db", STORE="kv", KEY="dataset", BK="backups";
+let idb=null;
+function openIDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,1);r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains(STORE))d.createObjectStore(STORE);if(!d.objectStoreNames.contains(BK))d.createObjectStore(BK);};r.onsuccess=e=>{idb=e.target.result;res(idb);};r.onerror=e=>rej(e);});}
+function idbGet(store,key){return new Promise((res,rej)=>{const tx=idb.transaction(store,"readonly").objectStore(store).get(key);tx.onsuccess=()=>res(tx.result);tx.onerror=e=>rej(e);});}
+function idbPut(store,key,val){return new Promise((res,rej)=>{const tx=idb.transaction(store,"readwrite");tx.objectStore(store).put(val,key);tx.oncomplete=()=>res();tx.onerror=e=>rej(e);});}
+function idbKeys(store){return new Promise((res,rej)=>{const tx=idb.transaction(store,"readonly").objectStore(store).getAllKeys();tx.onsuccess=()=>res(tx.result);tx.onerror=e=>rej(e);});}
+function idbDel(store,key){return new Promise((res,rej)=>{const tx=idb.transaction(store,"readwrite");tx.objectStore(store).delete(key);tx.oncomplete=()=>res();tx.onerror=e=>rej(e);});}
+
+/* ---------- standaard-dataset (leeg schema + parameters uit werkmap) ---------- */
+function defaultData(){
+  return {
+    _v:1, _created:new Date().toISOString(),
+    instellingen:{
+      bedrijf:"3D4U Printservice", tnv:"RLW van de Kamp",
+      adres:"", postcode:"", plaats:"", email:"", telefoon:"", website:"3d4u.nl",
+      kvk:"72695218", btwnummer:"", iban:"NL92INGB0002127708", bic:"INGBNL2A",
+      kor:true, btwStandaard:0, betaaltermijn:30, offertegeldigheid:14,
+      voettekstOfferte:"Bedankt voor je interesse en het vertrouwen! Wanneer je akkoord gaat, ga ik met veel plezier voor je aan de slag.",
+      voettekstFactuur:"Te betalen binnen 30 dagen na factuurdatum onder vermelding van het factuurnummer.",
+      voettekstPakbon:"Dankjewel voor het vertrouwen en de opdracht! Ben je tevreden? Een review op Google helpt me enorm.",
+      korTekst:"Vrijgesteld van btw op grond van de kleineondernemersregeling.",
+      // calculatie-parameters (Berekeningen-tab)
+      printerKosten:2300, afschrijvingJaar:2, urenPerJaar:800,
+      energieWatt:100, energiePrijs:0.30, ontwerpTarief:35, marge:2, adviesFactor:1.0
+    },
+    nummerreeksen:{ klant:1242, artikel:1, offerte:1, pakbon:1, factuur:1, factuurJaar:new Date().getFullYear() },
+    klanten:[], contactpersonen:[], producten:[], materialen:[], materiaalInkopen:[],
+    projecten:[], projectRegels:[], offertes:[], offerteRegels:[],
+    pakbonnen:[], pakbonRegels:[], facturen:[], factuurRegels:[], logboek:[]
+  };
+}
+
+/* ---------- filament-seed (FILAMENT-tab) ---------- */
+const FILAMENT_SEED=[
+ ["ASA","Wit",25,300],["ASA","Zwart",30,300],["PC","Zwart",53,300],
+ ["PETG","Blauw",16.89,300],["PETG","Bosgroen",16.89,300],["PETG","Felgroen",16.89,300],
+ ["PETG","GLOW",26,300],["PETG","Rood",16.89,300],["PETG","Wit",23.13,300],["PETG","Zwart",16.89,300],
+ ["PLA","Brons",23.38,300],["PLA","Donkerblauw",26.43,300],["PLA","Felgroen",25,300],
+ ["PLA","Kleur n.t.b.",10.5,300],["PLA","Marmer",28.46,300],["PLA","Silk",25.62,300],
+ ["PLA","Wit",16.88,300],["PLA","Wood",28.46,300],["PLA","Zwart",14.94,300],
+ ["PLA LTP","Wit,Blauw,Roze,Geel",16.875,300],["PLA MAT","Creme",14.94,300],["PLA MAT","Donkerbruin",10.5,300],
+ ["PLA MAT","Hemelsblauw",12.86,300],["PLA MAT","Lichtbruin",10.5,300],["PLA MAT","Marineblauw",12.86,300],
+ ["PLA MAT","Oranje",12.86,300],["PLA MAT","Paars",14.94,300],["PLA MAT","Rood",12.86,300],
+ ["PLA MAT","Zwart",10.5,300],["PLA-CF","Zwart",35,150],["TPU","Wit",44.73,300],["TPU AMS","Zwart",33.5,300]
+];
+function seedIfEmpty(d){
+  if(d.materialen.length===0){
+    d.materialen=FILAMENT_SEED.map((f,i)=>({
+      id:uid(), code:"MAT-"+String(i+1).padStart(3,"0"), materiaal:f[0], kleur:f[1],
+      naam:f[0]+" - "+f[1], type:"Filament", dichtheid:"", eenheid:"meter",
+      prijsRol:f[2], meterPerRol:f[3], eurPerMeter:f[2]/f[3],
+      leverancier:"", laatsteInkoopdatum:"", veiligheidsvoorraad:0, voorraadMeter:0, opmerkingen:""
+    }));
+  }
+  if(d.klanten.length===0){
+    d.klanten=[
+      {id:uid(),klantnummer:1241,bedrijf:"",contactpersoon:"Pieter",afkorting:"PTR",email:"",telefoon:"",adres:"",postcode:"",plaats:"",land:"Nederland",btwnummer:"",kvk:"",betaaltermijn:30,korting:0,via:"",opmerkingen:""}
+    ];
+  }
+  return d;
+}
+
+/* ---------- persistentie ---------- */
+let DATA=null, dirty=false, saveTimer=null, fileHandle=null;
+function setDirty(){dirty=true;$("#savedot").classList.add("dirty");$("#savetxt").textContent="Wijzigingen…";clearTimeout(saveTimer);saveTimer=setTimeout(persist,700);}
+async function persist(){
+  try{
+    await idbPut(STORE,KEY,DATA);
+    if(fileHandle){try{const w=await fileHandle.createWritable();await w.write(JSON.stringify(DATA));await w.close();}catch(e){/*stille fallback*/}}
+    dirty=false;$("#savedot").classList.remove("dirty");
+    $("#savetxt").textContent="Opgeslagen "+new Date().toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"});
+  }catch(e){$("#savetxt").textContent="⚠ Opslaan mislukt";toast("Opslaan mislukt: "+e.message,"err");}
+}
+async function makeAutoBackup(reason){
+  try{
+    const stamp=new Date().toISOString().replace(/[:.]/g,"-");
+    await idbPut(BK,"bk_"+stamp,{ts:new Date().toISOString(),reason,data:DATA});
+    const keys=(await idbKeys(BK)).sort();
+    while(keys.length>12){await idbDel(BK,keys.shift());}
+  }catch(e){}
+}
+function log(actie,type="",nummer="",project="",oms=""){
+  DATA.logboek.unshift({id:uid(),ts:new Date().toISOString(),gebruiker:"RLW",actie,type,nummer,project,oms});
+  if(DATA.logboek.length>2000)DATA.logboek.length=2000;
+}
+
+/* ---------- nummerreeksen ---------- */
+function nextNum(kind){
+  const r=DATA.nummerreeksen; const jaar=new Date().getFullYear();
+  if(kind==="klant"){return r.klant++;}
+  if(kind==="artikel"){return "ART-"+String(r.artikel++).padStart(4,"0");}
+  if(kind==="factuur"){ if(r.factuurJaar!==jaar){r.factuurJaar=jaar;r.factuur=1;} return "FAC-"+jaar+"-"+String(r.factuur++).padStart(4,"0"); }
+  if(kind==="offerte"){return "OFF-"+jaar+"-"+String(r.offerte++).padStart(4,"0");}
+  if(kind==="pakbon"){return "PAK-"+jaar+"-"+String(r.pakbon++).padStart(4,"0");}
+}
+// projectcode volgens 3D4U-conventie: YY M D + klantafkorting (zoals in werkmap: 2677PTR)
+function projectCode(datum,afk){const dt=new Date(datum||today());const yy=dt.getFullYear()-2000;return `${yy}${dt.getMonth()+1}${dt.getDate()}${(afk||"XXX").toUpperCase()}`;}
+
+/* ---------- lookups ---------- */
+const byId=(arr,id)=>arr.find(x=>x.id===id);
+const klantNaam=k=>!k?"—":(k.bedrijf||k.contactpersoon||("Klant "+k.klantnummer));
+function klantOf(id){return byId(DATA.klanten,id);}
+function materiaalOf(id){return byId(DATA.materialen,id);}
+function projectOf(id){return byId(DATA.projecten,id);}
+</script>
+<script>
+/* ==========================================================================
+   CALCULATIE (3D4U printmodel — exact als Berekeningen/Database-tab)
+   ========================================================================== */
+function calcParams(){
+  const s=DATA.instellingen;
+  const levensduur=(s.urenPerJaar||1)*(s.afschrijvingJaar||1);
+  const afschrPerUur=levensduur?(s.printerKosten/levensduur):0;      // 2300/1600 = 1,4375
+  const stroomPerUur=(s.energieWatt/1000)*s.energiePrijs;            // 100/1000*0,30 = 0,03
+  return {afschrPerUur,stroomPerUur,ontwerpTarief:s.ontwerpTarief,marge:s.marge,adviesFactor:s.adviesFactor||1};
+}
+// Berekening per regel. eurPerMeter wordt bevroren op calc-moment.
+function calcRegel(r){
+  const p=calcParams();
+  const aantal=parseNum(r.aantal)||1;
+  const meter=parseNum(r.meterMateriaal);
+  const printuren=parseNum(r.printuren);
+  const ontwerpuren=parseNum(r.ontwerpuren);
+  const epm=parseNum(r.eurPerMeterFrozen);
+  const materiaalKosten=epm*meter*aantal;
+  const stroomKosten=printuren*aantal*p.stroomPerUur;
+  const afschrijving=printuren*aantal*p.afschrPerUur;
+  const ontwerpKosten=ontwerpuren*p.ontwerpTarief;
+  const kostprijsPerStuk=aantal?((materiaalKosten+stroomKosten+afschrijving)/aantal):0;
+  const adviesPerStuk=kostprijsPerStuk*p.marge*p.adviesFactor;
+  const verkoopPerStuk=(r.verkoopprijs!=null&&r.verkoopprijs!=="")?parseNum(r.verkoopprijs):adviesPerStuk;
+  const regelTotaal=verkoopPerStuk*aantal+ontwerpKosten+parseNum(r.eenmaligeKosten);
+  const kostTotaal=kostprijsPerStuk*aantal+ontwerpKosten;
+  return {materiaalKosten,stroomKosten,afschrijving,ontwerpKosten,kostprijsPerStuk,adviesPerStuk,verkoopPerStuk,regelTotaal,kostTotaal,
+    winst:regelTotaal-kostTotaal, marge:regelTotaal?((regelTotaal-kostTotaal)/regelTotaal*100):0};
+}
+function regelsVanProject(pid){return DATA.projectRegels.filter(r=>r.projectId===pid);}
+function projectWaarde(pid){return regelsVanProject(pid).reduce((s,r)=>s+calcRegel(r).regelTotaal,0);}
+
+/* ==========================================================================
+   STATUSSEN
+   ========================================================================== */
+const PROJECT_STATUS=["Aanvraag","Offertefase","Offerte verzonden","Offerte akkoord","In productie","Deellevering","Afgerond","Geannuleerd","Verloren"];
+const STATUS_STYLE={
+ "Aanvraag":"gray","Offertefase":"blue","Offerte verzonden":"blue","Offerte akkoord":"acc",
+ "In productie":"purple","Deellevering":"warn","Afgerond":"ok","Geannuleerd":"err","Verloren":"err",
+ "Concept":"gray","Verzonden":"blue","Akkoord":"ok","Verloren·":"err","Vervallen":"gray","Vervangen":"gray",
+ "Betaald":"ok","Deels betaald":"warn","Gecrediteerd":"gray","Open":"warn"
+};
+const OFFERTE_STATUS=["Concept","Verzonden","Akkoord","Verloren","Vervallen","Vervangen"];
+const FACTUUR_STATUS=["Concept","Verzonden","Betaald","Deels betaald","Vervallen","Gecrediteerd"];
+function pill(status){const cls=STATUS_STYLE[status]||"gray";return `<span class="pill ${cls}"><span class="dot"></span>${esc(status)}</span>`;}
+
+// afgeleide projectsignalering
+function projectSignaal(pid){
+  const offs=DATA.offertes.filter(o=>o.projectId===pid);
+  const paks=DATA.pakbonnen.filter(p=>p.projectId===pid);
+  const facs=DATA.facturen.filter(f=>f.projectId===pid);
+  const s=[];
+  if(offs.length===0)s.push({t:"Geen offerte",c:"gray"});
+  else if(offs.some(o=>o.status==="Verzonden"))s.push({t:"Offerte in afwachting",c:"blue"});
+  const gefactureerd=facs.filter(f=>f.status!=="Gecrediteerd"&&f.status!=="Concept").reduce((a,f)=>a+factuurTotaal(f.id).totaal,0);
+  const waarde=projectWaarde(pid);
+  if(waarde>0){
+    if(gefactureerd<=0.01)s.push({t:"Nog niet gefactureerd",c:"warn"});
+    else if(gefactureerd+0.01<waarde)s.push({t:"Deels gefactureerd",c:"warn"});
+    else s.push({t:"Volledig gefactureerd",c:"ok"});
+  }
+  if(facs.some(f=>f.status==="Verzonden"&&f.vervaldatum&&f.vervaldatum<today()))s.push({t:"Factuur verlopen",c:"err"});
+  return s;
+}
+
+/* ==========================================================================
+   ROUTER / SHELL
+   ========================================================================== */
+const NAV=[
+ {grp:"Overzicht"},
+ {id:"dashboard",ic:"▦",label:"Dashboard"},
+ {grp:"Beheer (formulieren)"},
+ {id:"klanten",ic:"◉",label:"Klanten"},
+ {id:"producten",ic:"◈",label:"Producten"},
+ {id:"materialen",ic:"▤",label:"Materialen"},
+ {id:"inkoop",ic:"↧",label:"Materiaalinkoop"},
+ {grp:"Projecten & documenten"},
+ {id:"projecten",ic:"▣",label:"Projecten"},
+ {id:"offertes",ic:"◧",label:"Offertes"},
+ {id:"pakbonnen",ic:"⧉",label:"Pakbonnen"},
+ {id:"facturen",ic:"€",label:"Facturen"},
+ {grp:"Systeem"},
+ {id:"instellingen",ic:"⚙",label:"Instellingen"},
+ {id:"backup",ic:"⤓",label:"Back-up & data"},
+ {id:"logboek",ic:"≡",label:"Logboek"}
+];
+let route={view:"dashboard",id:null};
+function go(view,id=null){route={view,id};render();if(typeof closeDrawer==="function")closeDrawer();window.scrollTo(0,0);}
+function openDrawer(){$("#sidebar").classList.add("open");$("#navBackdrop").classList.add("show");}
+function closeDrawer(){$("#sidebar").classList.remove("open");$("#navBackdrop").classList.remove("show");}
+function toggleDrawer(){$("#sidebar").classList.contains("open")?closeDrawer():openDrawer();}
+function counts(){return {klanten:DATA.klanten.length,producten:DATA.producten.length,materialen:DATA.materialen.length,projecten:DATA.projecten.filter(p=>!["Afgerond","Geannuleerd","Verloren"].includes(p.status)).length,offertes:DATA.offertes.filter(o=>o.status==="Verzonden").length,facturen:DATA.facturen.filter(f=>["Verzonden","Deels betaald"].includes(f.status)).length};}
+function buildNav(){
+  const c=counts();const nav=$("#nav");nav.innerHTML="";
+  for(const n of NAV){
+    if(n.grp){nav.append(el("div",{class:"grp"},n.grp));continue;}
+    const a=el("a",{href:"#",class:route.view===n.id?"active":"",onclick:e=>{e.preventDefault();go(n.id);}},
+      el("span",{class:"ic"},n.ic),el("span",{},n.label));
+    if(c[n.id])a.append(el("span",{class:"badge"},String(c[n.id])));
+    nav.append(a);
+  }
+}
+const TITLES={dashboard:"Dashboard",klanten:"Klanten",producten:"Producten",materialen:"Materialen",inkoop:"Materiaalinkoop",projecten:"Projecten",offertes:"Offertes",pakbonnen:"Pakbonnen",facturen:"Facturen",instellingen:"Instellingen",backup:"Back-up & data",logboek:"Logboek",project:"Project"};
+function render(){
+  buildNav();
+  $("#pageActions").innerHTML="";$("#pageCrumb").textContent="";
+  const v=route.view;
+  $("#pageTitle").textContent=TITLES[v]||"3D4U ERP";
+  const c=$("#content");c.innerHTML="";
+  ({dashboard:viewDashboard,klanten:viewKlanten,producten:viewProducten,materialen:viewMaterialen,
+    inkoop:viewInkoop,projecten:viewProjecten,project:viewProjectDetail,offertes:viewOffertes,
+    pakbonnen:viewPakbonnen,facturen:viewFacturen,instellingen:viewInstellingen,backup:viewBackup,logboek:viewLogboek}[v]||viewDashboard)(c);
+}
+function actionBtn(label,fn,cls="btn"){const b=el("button",{class:cls,onclick:fn},label);$("#pageActions").append(b);return b;}
+</script>
+<script>
+/* ==========================================================================
+   MODAL + FORMULIER-FRAMEWORK
+   ========================================================================== */
+let activeModal=null;
+function closeModal(){if(activeModal){activeModal.remove();activeModal=null;}}
+function openModal(title,bodyNode,footerBtns,wide=false){
+  closeModal();
+  const body=el("div",{class:"mb"});body.append(bodyNode);
+  const foot=el("div",{class:"mf"});(footerBtns||[]).forEach(b=>foot.append(b));
+  const m=el("div",{class:"modal"+(wide?" wide":"")},
+    el("div",{class:"mh"},el("h3",{},title),el("button",{class:"x",onclick:closeModal},"×")),
+    body,foot);
+  const ov=el("div",{class:"overlay",onclick:e=>{if(e.target===ov)closeModal();}},m);
+  document.body.append(ov);activeModal=ov;return ov;
+}
+// veld-generator; spec:{key,label,type,req,opts,hint,val,attrs,step,rows}
+function buildForm(fields,model){
+  const wrap=el("div");const refs={};
+  const rows=[];let cur=null;
+  for(const f of fields){
+    if(f.section){wrap.append(el("div",{class:"section-t"},f.section));continue;}
+    let input;
+    const v=model[f.key]??f.val??"";
+    if(f.type==="select"){
+      input=el("select",{});(f.opts||[]).forEach(o=>{const val=typeof o==="object"?o.v:o;const lab=typeof o==="object"?o.l:o;input.append(el("option",{value:val,selected:String(val)===String(v)?"selected":null},lab));});
+    }else if(f.type==="textarea"){
+      input=el("textarea",{rows:f.rows||3});input.value=v;
+    }else if(f.type==="checkbox"){
+      input=el("input",{type:"checkbox"});input.checked=!!v;
+    }else{
+      input=el("input",{type:f.type||"text",step:f.step||null,placeholder:f.ph||null});input.value=v;
+    }
+    if(f.attrs)for(const k in f.attrs)input.setAttribute(k,f.attrs[k]);
+    if(f.oninput)input.addEventListener("input",()=>f.oninput(getVals(refs),refs));
+    if(f.onchange)input.addEventListener("change",()=>f.onchange(getVals(refs),refs));
+    refs[f.key]={input,f};
+    const field=el("div",{class:"field"},
+      f.type==="checkbox"?null:el("label",{html:esc(f.label)+(f.req?' <span class="req">*</span>':"")}),
+      f.type==="checkbox"?el("label",{style:"display:flex;gap:8px;align-items:center;cursor:pointer"},input,el("span",{},f.label)):input,
+      f.hint?el("div",{class:"hint",html:f.hint}):null);
+    field.__ref=refs[f.key];
+    if(f.half){ if(!cur||cur.__count>=(f.cols||2)){cur=el("div",{class:"frow c"+(f.cols||2)});cur.__count=0;wrap.append(cur);} cur.append(field);cur.__count++; }
+    else{cur=null;wrap.append(field);}
+  }
+  wrap.__refs=refs;
+  return wrap;
+}
+function getVals(refs){const o={};for(const k in refs){const{input}=refs[k];o[k]=input.type==="checkbox"?input.checked:input.value;}return o;}
+function validate(refs){let ok=true;for(const k in refs){const{input,f}=refs[k];input.classList.remove("err");if(f.req&&!String(input.value).trim()){input.classList.add("err");ok=false;}}return ok;}
+
+/* ==========================================================================
+   HERBRUIKBARE LIJST-TABEL
+   ========================================================================== */
+function mkTable(cont,{cols,items,onRow,empty}){
+  const wrap=el("div",{class:"tblwrap"});
+  const table=el("table",{},el("thead",{},el("tr",{},...cols.map(c=>el("th",{class:c.num?"num":""},c.h)))));
+  const tb=el("tbody");table.append(tb);wrap.append(table);cont.append(wrap);
+  const draw=(list)=>{
+    tb.innerHTML="";
+    if(!list.length){tb.append(el("tr",{},el("td",{colspan:cols.length,class:"empty"},empty||"Nog geen gegevens.")));return;}
+    list.forEach(it=>{
+      const tr=el("tr",{class:onRow?"click":"",onclick:onRow?()=>onRow(it):null});
+      cols.forEach(c=>tr.append(el("td",{class:c.num?"num":"",html:c.render(it)})));
+      tb.append(tr);
+    });
+  };
+  draw(items);
+  return {draw};
+}
+</script>
+<script>
+/* ==========================================================================
+   DASHBOARD
+   ========================================================================== */
+function viewDashboard(c){
+  const jaar=new Date().getFullYear(), maand=new Date().getMonth();
+  const facturenBetaald=DATA.facturen.filter(f=>["Betaald","Deels betaald","Verzonden"].includes(f.status));
+  let omzetJaar=0,omzetMaand=0;
+  facturenBetaald.forEach(f=>{const t=factuurTotaal(f.id).totaal;const d=new Date(f.datum||today());if(d.getFullYear()===jaar){omzetJaar+=t;if(d.getMonth()===maand)omzetMaand+=t;}});
+  const lopend=DATA.projecten.filter(p=>!["Afgerond","Geannuleerd","Verloren"].includes(p.status));
+  const inProductie=DATA.projecten.filter(p=>p.status==="In productie").length;
+  const offOpen=DATA.offertes.filter(o=>o.status==="Verzonden");
+  const facOpen=DATA.facturen.filter(f=>["Verzonden","Deels betaald"].includes(f.status));
+  const facVerlopen=facOpen.filter(f=>f.vervaldatum&&f.vervaldatum<today());
+  let nogTeFactureren=0;lopend.forEach(p=>{const w=projectWaarde(p.id);const g=DATA.facturen.filter(f=>f.projectId===p.id&&f.status!=="Concept"&&f.status!=="Gecrediteerd").reduce((a,f)=>a+factuurTotaal(f.id).totaal,0);if(w-g>0.01)nogTeFactureren+=w-g;});
+  // KPI's
+  const kpis=el("div",{class:"grid g4",style:"margin-bottom:18px"});
+  const kpi=(cls,lbl,val,foot)=>el("div",{class:"kpi "+cls},el("div",{class:"bar"}),el("div",{class:"lbl"},lbl),el("div",{class:"val"},val),el("div",{class:"foot"},foot||""));
+  kpis.append(
+    kpi("","Lopende projecten",String(lopend.length),inProductie+" in productie"),
+    kpi("blue","Openstaande offertes",String(offOpen.length),eur0(offOpen.reduce((a,o)=>a+offerteTotaal(o.id).totaal,0))+" in afwachting"),
+    kpi("warn","Openstaande facturen",String(facOpen.length),eur0(facOpen.reduce((a,f)=>a+factuurTotaal(f.id).totaal,0))+" te ontvangen"),
+    kpi("ok","Omzet "+jaar,eur0(omzetJaar),eur0(omzetMaand)+" deze maand")
+  );
+  c.append(kpis);
+  // waarschuwingen
+  const warns=[];
+  if(facVerlopen.length)warns.push({t:facVerlopen.length+" factuur(en) over vervaldatum",c:"err"});
+  if(nogTeFactureren>1)warns.push({t:eur0(nogTeFactureren)+" nog te factureren op lopende projecten",c:"warn"});
+  DATA.materialen.filter(m=>m.veiligheidsvoorraad>0&&(m.voorraadMeter||0)<m.veiligheidsvoorraad).forEach(m=>warns.push({t:"Lage voorraad: "+m.naam,c:"warn"}));
+  DATA.klanten.filter(k=>!k.email&&!k.telefoon).forEach(k=>warns.push({t:"Ontbrekende contactgegevens: "+klantNaam(k),c:"gray"}));
+  offOpen.filter(o=>o.geldigTot&&o.geldigTot<today()).forEach(o=>warns.push({t:"Offerte "+o.nummer+" is verlopen",c:"warn"}));
+  const left=el("div",{class:"card"});
+  left.append(el("div",{class:"section-t"},"Waarschuwingen"));
+  if(!warns.length)left.append(el("div",{class:"okbox"},"Alles in orde — geen openstaande waarschuwingen."));
+  else warns.slice(0,10).forEach(w=>left.append(el("div",{class:"warnbox",style:"margin-bottom:8px"},el("span",{},"⚠"),el("span",{},w.t))));
+  // recente projecten
+  const right=el("div",{class:"card"});
+  right.append(el("div",{class:"section-t"},"Recente projecten"));
+  const recent=[...DATA.projecten].sort((a,b)=>(b.aangemaakt||"").localeCompare(a.aangemaakt||"")).slice(0,7);
+  if(!recent.length)right.append(el("div",{class:"mini"},"Nog geen projecten. Maak er een aan bij ‘Projecten’."));
+  recent.forEach(p=>{
+    right.append(el("div",{style:"display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)",class:"click",onclick:()=>go("project",p.id)},
+      el("div",{style:"flex:1"},el("div",{style:"font-weight:600"},p.projectnaam||p.projectnummer),el("div",{class:"mini"},p.projectnummer+" · "+klantNaam(klantOf(p.klantId)))),
+      el("div",{class:"tag"},eur0(projectWaarde(p.id))),el("div",{html:pill(p.status)})));
+  });
+  c.append(el("div",{class:"grid g2"},left,right));
+  // topklanten
+  const topWrap=el("div",{class:"card",style:"margin-top:16px"});topWrap.append(el("div",{class:"section-t"},"Topklanten (omzet dit jaar)"));
+  const perKlant={};facturenBetaald.forEach(f=>{const d=new Date(f.datum||today());if(d.getFullYear()!==jaar)return;perKlant[f.klantId]=(perKlant[f.klantId]||0)+factuurTotaal(f.id).totaal;});
+  const top=Object.entries(perKlant).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if(!top.length)topWrap.append(el("div",{class:"mini"},"Nog geen gefactureerde omzet dit jaar."));
+  else{const max=top[0][1]||1;top.forEach(([kid,v])=>{const k=klantOf(kid);topWrap.append(el("div",{style:"margin:8px 0"},el("div",{style:"display:flex;justify-content:space-between;margin-bottom:3px"},el("span",{},klantNaam(k)),el("b",{class:"tag"},eur0(v))),el("div",{style:"height:7px;background:var(--panel2);border-radius:4px;overflow:hidden"},el("div",{style:`height:100%;width:${v/max*100}%;background:var(--acc)`}))));});}
+  c.append(topWrap);
+  actionBtn("+ Nieuw project",()=>projectForm(),"btn pri");
+}
+
+/* ==========================================================================
+   KLANTEN  (formulier → tabel)
+   ========================================================================== */
+function klantForm(existing){
+  const m=existing?{...existing}:{land:"Nederland",betaaltermijn:DATA.instellingen.betaaltermijn,korting:0};
+  const form=buildForm([
+    {section:"Bedrijf & contact"},
+    {key:"bedrijf",label:"Bedrijfsnaam",half:true,ph:"leeg = particulier"},
+    {key:"via",label:"Via / bron",half:true,ph:"Etsy, mond-tot-mond…"},
+    {key:"contactpersoon",label:"Contactpersoon",req:true,half:true},
+    {key:"afkorting",label:"Afkorting (voor projectcode)",half:true,ph:"bv. PTR",hint:"Gebruikt in projectnummer, bv. 2677<b>PTR</b>"},
+    {key:"email",label:"E-mailadres",type:"email",half:true},
+    {key:"telefoon",label:"Telefoon",half:true},
+    {section:"Adres"},
+    {key:"adres",label:"Adres"},
+    {key:"postcode",label:"Postcode",half:true,cols:3},
+    {key:"plaats",label:"Plaats",half:true,cols:3},
+    {key:"land",label:"Land",half:true,cols:3},
+    {section:"Administratief"},
+    {key:"btwnummer",label:"Btw-nummer",half:true},
+    {key:"kvk",label:"KvK-nummer",half:true},
+    {key:"betaaltermijn",label:"Betaaltermijn (dagen)",type:"number",half:true},
+    {key:"korting",label:"Standaard korting (%)",type:"number",step:"0.1",half:true},
+    {key:"opmerkingen",label:"Opmerkingen",type:"textarea"}
+  ],m);
+  // dubbele-klant waarschuwing
+  const dup=el("div");
+  form.__refs.contactpersoon.input.addEventListener("input",()=>checkDup());
+  form.__refs.bedrijf.input.addEventListener("input",()=>checkDup());
+  function checkDup(){const v=getVals(form.__refs);const naam=(v.bedrijf||v.contactpersoon||"").toLowerCase().trim();dup.innerHTML="";if(!naam)return;const hit=DATA.klanten.find(k=>k.id!==(existing&&existing.id)&&((k.bedrijf||"").toLowerCase()===naam||(k.contactpersoon||"").toLowerCase()===naam));if(hit)dup.append(el("div",{class:"warnbox"},el("span",{},"⚠"),el("span",{html:"Mogelijk dubbele klant: <b>"+esc(klantNaam(hit))+"</b> (nr "+hit.klantnummer+")"})));}
+  form.prepend(dup);
+  const save=el("button",{class:"btn pri",onclick:()=>{
+    if(!validate(form.__refs))return toast("Vul de verplichte velden in.","err");
+    const v=getVals(form.__refs);
+    v.betaaltermijn=parseNum(v.betaaltermijn)||0;v.korting=parseNum(v.korting)||0;
+    if(existing){Object.assign(existing,v);log("Klant gewijzigd","Klant",String(existing.klantnummer),"",klantNaam(existing));toast("Klant opgeslagen");}
+    else{const k={id:uid(),klantnummer:nextNum("klant"),...v};DATA.klanten.push(k);log("Klant aangemaakt","Klant",String(k.klantnummer),"",klantNaam(k));toast("Klant "+k.klantnummer+" aangemaakt");}
+    setDirty();closeModal();render();
+  }},existing?"Opslaan":"Klant aanmaken");
+  openModal(existing?"Klant bewerken · nr "+existing.klantnummer:"Nieuwe klant",form,[el("button",{class:"btn ghost",onclick:closeModal},"Annuleren"),save]);
+}
+function viewKlanten(c){
+  actionBtn("+ Nieuwe klant",()=>klantForm(),"btn pri");
+  const bar=el("div",{class:"toolbar"});
+  const search=el("div",{class:"search"},el("span",{class:"ic"},"⌕"),el("input",{placeholder:"Zoek op naam, plaats, e-mail…"}));
+  bar.append(search);c.append(bar);
+  const cols=[
+    {h:"Nr",render:k=>`<span class="tag">${k.klantnummer}</span>`},
+    {h:"Naam",render:k=>`<b>${esc(klantNaam(k))}</b>`+(k.bedrijf&&k.contactpersoon?`<div class="mini">${esc(k.contactpersoon)}</div>`:"")},
+    {h:"Afk.",render:k=>esc(k.afkorting||"—")},
+    {h:"Plaats",render:k=>esc(k.plaats||"—")},
+    {h:"E-mail",render:k=>esc(k.email||"—")},
+    {h:"Telefoon",render:k=>esc(k.telefoon||"—")},
+    {h:"Projecten",num:true,render:k=>String(DATA.projecten.filter(p=>p.klantId===k.id).length)},
+    {h:"",render:k=>`<button class="btn sm ghost" onclick="event.stopPropagation()">Bewerken</button>`}
+  ];
+  const t=mkTable(c,{cols,items:DATA.klanten,empty:"Nog geen klanten. Klik ‘Nieuwe klant’.",onRow:k=>klantForm(k)});
+  search.querySelector("input").addEventListener("input",e=>{const q=e.target.value.toLowerCase();t.draw(DATA.klanten.filter(k=>[klantNaam(k),k.plaats,k.email,k.afkorting,k.telefoon].join(" ").toLowerCase().includes(q)));});
+}
+</script>
+<script>
+/* ==========================================================================
+   PRODUCTEN  (formulier → tabel) — met ingebouwde print-calculatie
+   ========================================================================== */
+function productForm(existing){
+  const m=existing?{...existing}:{aantal:1,infill:"",materiaalId:DATA.materialen[0]?.id||""};
+  const matOpts=[{v:"",l:"— kies filament —"},...DATA.materialen.map(x=>({v:x.id,l:x.naam}))];
+  const klantOpts=[{v:"",l:"— (geen / standaardproduct) —"},...DATA.klanten.map(k=>({v:k.id,l:klantNaam(k)}))];
+  const preview=el("div",{class:"calcbox"});
+  const recalc=(v)=>{
+    const mat=materiaalOf(v.materiaalId);
+    const r=calcRegel({aantal:v.aantal,meterMateriaal:v.meterMateriaal,printuren:v.printuren,ontwerpuren:v.ontwerpuren,eurPerMeterFrozen:mat?mat.eurPerMeter:0,verkoopprijs:v.verkoopprijs,eenmaligeKosten:0});
+    preview.innerHTML="";
+    const row=(l,val,cls="")=>el("div",{class:"calcrow "+cls},el("span",{},l),el("b",{},val));
+    preview.append(
+      el("div",{class:"section-t",style:"margin-top:0"},"Live calculatie ("+(mat?esc(mat.naam):"geen materiaal")+")"),
+      row("Materiaalkosten",eur(r.materiaalKosten)),
+      row("Stroomkosten",eur(r.stroomKosten)),
+      row("Afschrijving",eur(r.afschrijving)),
+      row("Ontwerpkosten (eenmalig)",eur(r.ontwerpKosten)),
+      row("Kostprijs / stuk",eur(r.kostprijsPerStuk)),
+      row("Adviesprijs / stuk (marge ×"+num(DATA.instellingen.marge,1)+")",eur(r.adviesPerStuk),"big")
+    );
+    if(v.verkoopprijs)preview.append(row("Verkoopprijs / stuk",eur(r.verkoopPerStuk)),row("Marge",num(r.marge,1)+" %"));
+  };
+  const form=buildForm([
+    {section:"Identificatie"},
+    {key:"naam",label:"Productnaam",req:true,half:true},
+    {key:"klantId",label:"Klant / project-eigenaar",type:"select",opts:klantOpts,half:true},
+    {key:"omschrijving",label:"Omschrijving",type:"textarea",rows:2},
+    {section:"Print-parameters"},
+    {key:"materiaalId",label:"Filament",type:"select",opts:matOpts,req:true,half:true,cols:2,onchange:v=>recalc(v)},
+    {key:"infill",label:"Infill",half:true,cols:2,ph:"bv. 0,5"},
+    {key:"meterMateriaal",label:"Meter materiaal (per stuk × aantal totaal)",type:"number",step:"0.01",half:true,cols:3,oninput:v=>recalc(v),hint:"Zoals ‘Mat M’ in werkmap"},
+    {key:"printuren",label:"Printuren",type:"number",step:"0.1",half:true,cols:3,oninput:v=>recalc(v)},
+    {key:"ontwerpuren",label:"Ontwerpuren",type:"number",step:"0.1",half:true,cols:3,oninput:v=>recalc(v)},
+    {key:"aantal",label:"Referentie-aantal",type:"number",half:true,cols:2,oninput:v=>recalc(v)},
+    {key:"verkoopprijs",label:"Vaste verkoopprijs / stuk (optioneel)",type:"number",step:"0.01",half:true,cols:2,oninput:v=>recalc(v),hint:"Leeg = adviesprijs gebruiken"},
+    {key:"opmerkingen",label:"Opmerkingen",type:"textarea",rows:2}
+  ],m);
+  const body=el("div",{class:"grid g2",style:"align-items:start"},form,preview);
+  recalc(getVals(form.__refs));
+  const save=el("button",{class:"btn pri",onclick:()=>{
+    if(!validate(form.__refs))return toast("Vul de verplichte velden in.","err");
+    const v=getVals(form.__refs);["meterMateriaal","printuren","ontwerpuren","aantal","verkoopprijs","infill"].forEach(k=>v[k]=v[k]===""?"":parseNum(v[k]));
+    if(existing){Object.assign(existing,v);log("Product gewijzigd","Product",existing.artikelnummer,"",existing.naam);toast("Product opgeslagen");}
+    else{const p={id:uid(),artikelnummer:nextNum("artikel"),...v};DATA.producten.push(p);log("Product aangemaakt","Product",p.artikelnummer,"",p.naam);toast("Product "+p.artikelnummer+" aangemaakt");}
+    setDirty();closeModal();render();
+  }},existing?"Opslaan":"Product aanmaken");
+  openModal(existing?"Product bewerken · "+existing.artikelnummer:"Nieuw product",body,[el("button",{class:"btn ghost",onclick:closeModal},"Annuleren"),save],true);
+}
+function viewProducten(c){
+  actionBtn("+ Nieuw product",()=>productForm(),"btn pri");
+  const bar=el("div",{class:"toolbar"});const search=el("div",{class:"search"},el("span",{class:"ic"},"⌕"),el("input",{placeholder:"Zoek product…"}));bar.append(search);c.append(bar);
+  const cols=[
+    {h:"Artikel",render:p=>`<span class="tag">${esc(p.artikelnummer)}</span>`},
+    {h:"Naam",render:p=>`<b>${esc(p.naam)}</b>`+(p.omschrijving?`<div class="mini">${esc(p.omschrijving).slice(0,60)}</div>`:"")},
+    {h:"Klant",render:p=>esc(klantNaam(klantOf(p.klantId)))},
+    {h:"Materiaal",render:p=>esc(materiaalOf(p.materiaalId)?.naam||"—")},
+    {h:"Printuren",num:true,render:p=>num(p.printuren,1)},
+    {h:"Kostprijs/st",num:true,render:p=>{const mat=materiaalOf(p.materiaalId);return eur(calcRegel({...p,eurPerMeterFrozen:mat?mat.eurPerMeter:0}).kostprijsPerStuk);}},
+    {h:"Advies/st",num:true,render:p=>{const mat=materiaalOf(p.materiaalId);return `<b class="hl">${eur(calcRegel({...p,eurPerMeterFrozen:mat?mat.eurPerMeter:0}).adviesPerStuk)}</b>`;}},
+    {h:"",render:()=>`<button class="btn sm ghost">Bewerken</button>`}
+  ];
+  const t=mkTable(c,{cols,items:DATA.producten,empty:"Nog geen producten.",onRow:p=>productForm(p)});
+  search.querySelector("input").addEventListener("input",e=>{const q=e.target.value.toLowerCase();t.draw(DATA.producten.filter(p=>[p.naam,p.artikelnummer,p.omschrijving,klantNaam(klantOf(p.klantId))].join(" ").toLowerCase().includes(q)));});
+}
+
+/* ==========================================================================
+   MATERIALEN (filament-stamdata)
+   ========================================================================== */
+function materiaalForm(existing){
+  const m=existing?{...existing}:{eenheid:"meter",meterPerRol:300};
+  const form=buildForm([
+    {key:"materiaal",label:"Materiaal",req:true,half:true,ph:"PLA, PETG, ASA…"},
+    {key:"kleur",label:"Kleur",req:true,half:true},
+    {key:"type",label:"Type",half:true,ph:"Filament"},
+    {key:"leverancier",label:"Leverancier",half:true},
+    {key:"prijsRol",label:"Prijs per rol (€)",type:"number",step:"0.01",half:true,cols:3},
+    {key:"meterPerRol",label:"Meter per rol",type:"number",half:true,cols:3},
+    {key:"veiligheidsvoorraad",label:"Veiligheidsvoorraad (m)",type:"number",half:true,cols:3},
+    {key:"voorraadMeter",label:"Huidige voorraad (m)",type:"number",half:true},
+    {key:"opmerkingen",label:"Opmerkingen",type:"textarea",rows:2}
+  ],m);
+  const save=el("button",{class:"btn pri",onclick:()=>{
+    if(!validate(form.__refs))return toast("Vul materiaal en kleur in.","err");
+    const v=getVals(form.__refs);["prijsRol","meterPerRol","veiligheidsvoorraad","voorraadMeter"].forEach(k=>v[k]=parseNum(v[k]));
+    v.naam=v.materiaal+" - "+v.kleur;v.eurPerMeter=v.meterPerRol?v.prijsRol/v.meterPerRol:0;
+    if(existing){Object.assign(existing,v);toast("Materiaal opgeslagen");}
+    else{const mm={id:uid(),code:"MAT-"+String(DATA.materialen.length+1).padStart(3,"0"),eenheid:"meter",...v};DATA.materialen.push(mm);log("Materiaal toegevoegd","Materiaal",mm.code,"",mm.naam);toast("Materiaal toegevoegd");}
+    setDirty();closeModal();render();
+  }},existing?"Opslaan":"Toevoegen");
+  openModal(existing?"Materiaal bewerken":"Nieuw materiaal",form,[el("button",{class:"btn ghost",onclick:closeModal},"Annuleren"),save]);
+}
+function viewMaterialen(c){
+  actionBtn("+ Nieuw materiaal",()=>materiaalForm(),"btn");
+  actionBtn("↧ Materiaalinkoop boeken",()=>go("inkoop"),"btn pri");
+  const bar=el("div",{class:"toolbar"});const search=el("div",{class:"search"},el("span",{class:"ic"},"⌕"),el("input",{placeholder:"Zoek materiaal…"}));bar.append(search);c.append(bar);
+  const cols=[
+    {h:"Code",render:m=>`<span class="tag">${esc(m.code)}</span>`},
+    {h:"Materiaal – kleur",render:m=>`<b>${esc(m.naam)}</b>`},
+    {h:"Prijs/rol",num:true,render:m=>eur(m.prijsRol)},
+    {h:"Meter/rol",num:true,render:m=>num(m.meterPerRol,0)},
+    {h:"€ / meter",num:true,render:m=>`<b class="hl">${eur(m.eurPerMeter)}</b>`},
+    {h:"Voorraad (m)",num:true,render:m=>{const laag=m.veiligheidsvoorraad>0&&(m.voorraadMeter||0)<m.veiligheidsvoorraad;return `<span class="${laag?'pill warn':''}" style="${laag?'':'color:var(--mut)'}">${num(m.voorraadMeter||0,0)}</span>`;}},
+    {h:"Laatste inkoop",render:m=>fdate(m.laatsteInkoopdatum)},
+    {h:"",render:()=>`<button class="btn sm ghost">Bewerken</button>`}
+  ];
+  const t=mkTable(c,{cols,items:DATA.materialen,empty:"Nog geen materialen.",onRow:m=>materiaalForm(m)});
+  search.querySelector("input").addEventListener("input",e=>{const q=e.target.value.toLowerCase();t.draw(DATA.materialen.filter(m=>m.naam.toLowerCase().includes(q)));});
+}
+
+/* ==========================================================================
+   MATERIAALINKOOP (formulier → tabel, historisch gelogd)
+   ========================================================================== */
+function inkoopForm(){
+  const matOpts=[{v:"",l:"— kies materiaal —"},...DATA.materialen.map(x=>({v:x.id,l:x.naam}))];
+  const m={datum:today(),valuta:"EUR",eenheid:"meter"};
+  const tot=el("div",{class:"calcbox"});
+  const recalc=v=>{const prijs=parseNum(v.prijs),aantal=parseNum(v.aantal),transport=parseNum(v.transportkosten);const t=prijs*aantal+transport;const perM=aantal?t/aantal:0;tot.innerHTML="";tot.append(el("div",{class:"calcrow"},el("span",{},"Subtotaal"),el("b",{},eur(prijs*aantal))),el("div",{class:"calcrow"},el("span",{},"Transport"),el("b",{},eur(transport))),el("div",{class:"calcrow big"},el("span",{},"Totaalprijs"),el("b",{},eur(t))),el("div",{class:"calcrow"},el("span",{},"Nieuwe € / meter"),el("b",{},eur(perM))));};
+  const form=buildForm([
+    {key:"materiaalId",label:"Materiaal",type:"select",opts:matOpts,req:true,onchange:v=>recalc(v)},
+    {key:"leverancier",label:"Leverancier",half:true},
+    {key:"datum",label:"Inkoopdatum",type:"date",req:true,half:true},
+    {key:"prijs",label:"Prijs per meter (€)",type:"number",step:"0.0001",req:true,half:true,cols:3,oninput:v=>recalc(v),hint:"Of per rol ÷ meters"},
+    {key:"aantal",label:"Aantal (meter)",type:"number",step:"0.01",req:true,half:true,cols:3,oninput:v=>recalc(v)},
+    {key:"transportkosten",label:"Transport (€)",type:"number",step:"0.01",half:true,cols:3,oninput:v=>recalc(v)},
+    {key:"valuta",label:"Valuta",half:true},
+    {key:"opmerkingen",label:"Opmerkingen",type:"textarea",rows:2}
+  ],m);
+  recalc(getVals(form.__refs));
+  const body=el("div",{class:"grid g2",style:"align-items:start"},form,tot);
+  const save=el("button",{class:"btn pri",onclick:()=>{
+    if(!validate(form.__refs))return toast("Vul materiaal, prijs, aantal en datum in.","err");
+    const v=getVals(form.__refs);const prijs=parseNum(v.prijs),aantal=parseNum(v.aantal),transport=parseNum(v.transportkosten);
+    const inkoop={id:uid(),materiaalId:v.materiaalId,leverancier:v.leverancier,datum:v.datum,prijs,aantal,transportkosten:transport,totaal:prijs*aantal+transport,valuta:v.valuta,opmerkingen:v.opmerkingen};
+    DATA.materiaalInkopen.unshift(inkoop);
+    // materiaal bijwerken: nieuwste prijs + voorraad. Historie blijft bewaard in materiaalInkopen.
+    const mat=materiaalOf(v.materiaalId);const nieuwPerM=aantal?(prijs*aantal+transport)/aantal:prijs;
+    mat.eurPerMeter=nieuwPerM;mat.prijsRol=prijs*Math.min(aantal,mat.meterPerRol||aantal);mat.laatsteInkoopdatum=v.datum;mat.leverancier=v.leverancier||mat.leverancier;mat.voorraadMeter=(mat.voorraadMeter||0)+aantal;
+    log("Materiaalprijs toegevoegd","Materiaal",mat.code,"",mat.naam+" → "+eur(nieuwPerM)+"/m");
+    setDirty();closeModal();render();toast("Inkoop geboekt · nieuwe prijs "+eur(nieuwPerM)+"/m");
+  }},"Inkoop boeken");
+  openModal("Nieuwe materiaalinkoop",body,[el("button",{class:"btn ghost",onclick:closeModal},"Annuleren"),save],true);
+}
+function viewInkoop(c){
+  actionBtn("+ Nieuwe inkoop",()=>inkoopForm(),"btn pri");
+  c.append(el("div",{class:"okbox",style:"margin-bottom:16px"},"Elke inkoop werkt de actuele materiaalprijs bij én blijft historisch bewaard. Bestaande calculaties op offertes/facturen bevriezen hun prijs en veranderen dus niet mee."));
+  const cols=[
+    {h:"Datum",render:i=>fdate(i.datum)},
+    {h:"Materiaal",render:i=>`<b>${esc(materiaalOf(i.materiaalId)?.naam||"?")}</b>`},
+    {h:"Leverancier",render:i=>esc(i.leverancier||"—")},
+    {h:"Aantal (m)",num:true,render:i=>num(i.aantal,0)},
+    {h:"€/m",num:true,render:i=>eur(i.prijs)},
+    {h:"Transport",num:true,render:i=>eur(i.transportkosten)},
+    {h:"Totaal",num:true,render:i=>`<b>${eur(i.totaal)}</b>`},
+    {h:"Effectief €/m",num:true,render:i=>`<span class="hl">${eur(i.aantal?i.totaal/i.aantal:i.prijs)}</span>`}
+  ];
+  mkTable(c,{cols,items:DATA.materiaalInkopen,empty:"Nog geen inkopen geboekt."});
+}
+</script>
+<script>
+/* ==========================================================================
+   DOCUMENT-TOTALEN (offerte / pakbon / factuur)
+   Documentregels worden bij aanmaken bevroren (prijs + omschrijving), zodat
+   oude documenten reproduceerbaar blijven.
+   ========================================================================== */
+function docTotaal(regels,btwPct){
+  const subtotaal=regels.reduce((s,r)=>s+ (parseNum(r.aantal)*parseNum(r.stukprijs)*(1-parseNum(r.korting)/100)),0);
+  const btw=subtotaal*(parseNum(btwPct)/100);
+  return {subtotaal,btw,totaal:subtotaal+btw};
+}
+function offerteTotaal(id){const o=byId(DATA.offertes,id);const r=DATA.offerteRegels.filter(x=>x.offerteId===id);return docTotaal(r,o?o.btwPct:0);}
+function factuurTotaal(id){const f=byId(DATA.facturen,id);const r=DATA.factuurRegels.filter(x=>x.factuurId===id);return docTotaal(r,f?f.btwPct:0);}
+
+// bouw documentregels uit projectregels (bevriezen)
+function regelsUitProject(pid){
+  const out=[];
+  regelsVanProject(pid).forEach(r=>{
+    const cr=calcRegel(r);
+    out.push({id:uid(),product:r.naam,omschrijving:r.omschrijving||"",aantal:parseNum(r.aantal),eenheid:"stuks",stukprijs:cr.verkoopPerStuk,korting:0});
+    const eenmalig=cr.ontwerpKosten+parseNum(r.eenmaligeKosten);
+    if(eenmalig>0.001)out.push({id:uid(),product:"Ontwerp, voorbereiding & verwerking",omschrijving:r.naam,aantal:1,eenheid:"",stukprijs:eenmalig,korting:0});
+  });
+  return out;
+}
+
+/* ==========================================================================
+   PROJECTEN — centrale database (tabelvorm) + detailweergave
+   ========================================================================== */
+function projectForm(existing){
+  const klantOpts=[{v:"",l:"— kies klant —"},...DATA.klanten.map(k=>({v:k.id,l:klantNaam(k)+" (nr "+k.klantnummer+")"}))];
+  const m=existing?{...existing}:{startdatum:today(),status:"Aanvraag"};
+  const codePrev=el("div",{class:"hint"});
+  const updCode=v=>{const k=klantOf(v.klantId);codePrev.innerHTML="Projectcode wordt: <b class='hl'>"+esc(projectCode(v.startdatum,k?.afkorting))+"</b>";};
+  const form=buildForm([
+    {key:"projectnaam",label:"Projectnaam",req:true,half:true},
+    {key:"klantId",label:"Klant",type:"select",opts:klantOpts,req:true,half:true,onchange:v=>updCode(v)},
+    {key:"startdatum",label:"Startdatum",type:"date",half:true,cols:3,onchange:v=>updCode(v)},
+    {key:"deadline",label:"Deadline",type:"date",half:true,cols:3},
+    {key:"status",label:"Status",type:"select",opts:PROJECT_STATUS,half:true,cols:3},
+    {key:"omschrijving",label:"Omschrijving",type:"textarea",rows:2},
+    {key:"externeNotitie",label:"Externe opmerkingen (op documenten)",type:"textarea",rows:2},
+    {key:"interneNotitie",label:"Interne opmerkingen",type:"textarea",rows:2}
+  ],m);
+  if(!existing){form.append(codePrev);updCode(getVals(form.__refs));}
+  const save=el("button",{class:"btn pri",onclick:()=>{
+    if(!validate(form.__refs))return toast("Vul projectnaam en klant in.","err");
+    const v=getVals(form.__refs);
+    if(existing){Object.assign(existing,v);log("Project gewijzigd","Project",existing.projectnummer,existing.projectnummer,existing.projectnaam);toast("Project opgeslagen");setDirty();closeModal();render();}
+    else{const k=klantOf(v.klantId);const p={id:uid(),projectnummer:projectCode(v.startdatum,k?.afkorting),aangemaakt:new Date().toISOString(),...v};DATA.projecten.push(p);log("Project aangemaakt","Project",p.projectnummer,p.projectnummer,p.projectnaam);toast("Project "+p.projectnummer+" aangemaakt");setDirty();closeModal();go("project",p.id);}
+  }},existing?"Opslaan":"Project aanmaken");
+  openModal(existing?"Project bewerken · "+existing.projectnummer:"Nieuw project",form,[el("button",{class:"btn ghost",onclick:closeModal},"Annuleren"),save]);
+}
+function viewProjecten(c){
+  actionBtn("+ Nieuw project",()=>projectForm(),"btn pri");
+  const bar=el("div",{class:"toolbar"});
+  const search=el("div",{class:"search"},el("span",{class:"ic"},"⌕"),el("input",{placeholder:"Zoek project, klant, nummer…"}));
+  const statusSel=el("select",{style:"background:var(--panel);border:1px solid var(--line2);border-radius:7px;padding:9px 11px;color:var(--txt)"},el("option",{value:""},"Alle statussen"),...PROJECT_STATUS.map(s=>el("option",{value:s},s)));
+  bar.append(search,statusSel);c.append(bar);
+  const cols=[
+    {h:"Projectnr",render:p=>`<span class="tag">${esc(p.projectnummer)}</span>`},
+    {h:"Naam",render:p=>`<b>${esc(p.projectnaam)}</b>`},
+    {h:"Klant",render:p=>esc(klantNaam(klantOf(p.klantId)))},
+    {h:"Start",render:p=>fdate(p.startdatum)},
+    {h:"Deadline",render:p=>p.deadline?fdate(p.deadline):"—"},
+    {h:"Regels",num:true,render:p=>String(regelsVanProject(p.id).length)},
+    {h:"Waarde",num:true,render:p=>`<b>${eur0(projectWaarde(p.id))}</b>`},
+    {h:"Docs",render:p=>{const o=DATA.offertes.filter(x=>x.projectId===p.id).length,pk=DATA.pakbonnen.filter(x=>x.projectId===p.id).length,f=DATA.facturen.filter(x=>x.projectId===p.id).length;return `<span class="mini">${o?o+"×OFF ":""}${pk?pk+"×PAK ":""}${f?f+"×FAC":""}</span>`||"—";}},
+    {h:"Status",render:p=>pill(p.status)}
+  ];
+  const t=mkTable(c,{cols,items:sortProj(DATA.projecten),empty:"Nog geen projecten.",onRow:p=>go("project",p.id)});
+  const filt=()=>{const q=search.querySelector("input").value.toLowerCase();const st=statusSel.value;t.draw(sortProj(DATA.projecten).filter(p=>(!st||p.status===st)&&[p.projectnaam,p.projectnummer,klantNaam(klantOf(p.klantId))].join(" ").toLowerCase().includes(q)));};
+  search.querySelector("input").addEventListener("input",filt);statusSel.addEventListener("change",filt);
+}
+function sortProj(arr){const rank=s=>["In productie","Deellevering","Offerte akkoord","Offerte verzonden","Offertefase","Aanvraag","Afgerond","Verloren","Geannuleerd"].indexOf(s);return [...arr].sort((a,b)=>rank(a.status)-rank(b.status)||(b.aangemaakt||"").localeCompare(a.aangemaakt||""));}
+</script>
+<script>
+/* ==========================================================================
+   PROJECT-DETAIL
+   ========================================================================== */
+let projTab="regels";
+function viewProjectDetail(c){
+  const p=projectOf(route.id);
+  if(!p){c.append(el("div",{class:"empty"},"Project niet gevonden."));return;}
+  $("#pageTitle").textContent=p.projectnaam;
+  $("#pageCrumb").innerHTML=`<button class="linkbtn" onclick="go('projecten')">Projecten</button> › ${esc(p.projectnummer)}`;
+  actionBtn("Bewerken",()=>projectForm(p),"btn ghost");
+  actionBtn("+ Regel",()=>regelForm(p.id),"btn");
+  // header
+  const stSel=el("select",{style:"background:var(--panel2);border:1px solid var(--line2);border-radius:20px;padding:4px 12px;color:var(--txt);font-weight:600",onchange:e=>{p.status=e.target.value;log("Projectstatus gewijzigd","Project",p.projectnummer,p.projectnummer,"→ "+p.status);setDirty();toast("Status: "+p.status);render();}},...PROJECT_STATUS.map(s=>el("option",{value:s,selected:s===p.status?"selected":null},s)));
+  const head=el("div",{class:"detailhead"},el("div",{},el("div",{class:"tag"},p.projectnummer),el("div",{class:"big"},p.projectnaam)),stSel);
+  const sig=projectSignaal(p.id);sig.forEach(s=>head.append(el("span",{class:"pill "+s.c},s.t)));
+  c.append(head);
+  // KPI grid
+  const waarde=projectWaarde(p.id);
+  const gefactureerd=DATA.facturen.filter(f=>f.projectId===p.id&&!["Concept","Gecrediteerd"].includes(f.status)).reduce((a,f)=>a+factuurTotaal(f.id).totaal,0);
+  const betaald=DATA.facturen.filter(f=>f.status==="Betaald"&&f.projectId===p.id).reduce((a,f)=>a+factuurTotaal(f.id).totaal,0);
+  const kv=el("div",{class:"subgrid",style:"margin-bottom:18px"});
+  const kvi=(k,v)=>el("div",{class:"kv"},el("div",{class:"k"},k),el("div",{class:"v",html:v}));
+  kv.append(
+    kvi("Klant",esc(klantNaam(klantOf(p.klantId)))),
+    kvi("Startdatum",fdate(p.startdatum)),
+    kvi("Deadline",p.deadline?fdate(p.deadline):"—"),
+    kvi("Projectwaarde",eur(waarde)),
+    kvi("Gefactureerd",eur(gefactureerd)),
+    kvi("Nog te factureren","<b class='hl'>"+eur(Math.max(0,waarde-gefactureerd))+"</b>")
+  );
+  c.append(kv);
+  if(p.omschrijving)c.append(el("div",{class:"mini",style:"margin-bottom:14px"},"📝 "+p.omschrijving));
+  // tabs
+  const tabs=el("div",{class:"tabs"});
+  const tabDefs=[["regels","Calculatie / regels ("+regelsVanProject(p.id).length+")"],["offertes","Offertes ("+DATA.offertes.filter(o=>o.projectId===p.id).length+")"],["pakbonnen","Pakbonnen ("+DATA.pakbonnen.filter(o=>o.projectId===p.id).length+")"],["facturen","Facturen ("+DATA.facturen.filter(o=>o.projectId===p.id).length+")"]];
+  const pane=el("div");
+  tabDefs.forEach(([id,lab])=>tabs.append(el("button",{class:projTab===id?"active":"",onclick:()=>{projTab=id;drawPane();$$(".tabs button",tabs).forEach((b,i)=>b.classList.toggle("active",tabDefs[i][0]===id));}},lab)));
+  c.append(tabs,pane);
+  function drawPane(){pane.innerHTML="";({regels:paneRegels,offertes:paneOffertes,pakbonnen:panePakbonnen,facturen:paneFacturen}[projTab])(pane,p);}
+  drawPane();
+}
+
+function paneRegels(pane,p){
+  const regels=regelsVanProject(p.id);
+  const cols=[
+    {h:"Product",render:r=>`<b>${esc(r.naam)}</b>`+(r.omschrijving?`<div class="mini">${esc(r.omschrijving).slice(0,50)}</div>`:"")},
+    {h:"Materiaal",render:r=>esc(materiaalOf(r.materiaalId)?.naam||"—")},
+    {h:"Aantal",num:true,render:r=>num(r.aantal,0)},
+    {h:"Print u",num:true,render:r=>num(r.printuren,1)},
+    {h:"Kostprijs/st",num:true,render:r=>eur(calcRegel(r).kostprijsPerStuk)},
+    {h:"Verkoop/st",num:true,render:r=>eur(calcRegel(r).verkoopPerStuk)},
+    {h:"Regeltotaal",num:true,render:r=>`<b>${eur(calcRegel(r).regelTotaal)}</b>`},
+    {h:"Marge",num:true,render:r=>{const mrg=calcRegel(r).marge;return `<span class="pill ${mrg<15?'warn':'ok'}">${num(mrg,0)}%</span>`;}},
+    {h:"",render:()=>`<button class="btn sm ghost">Wijzig</button>`}
+  ];
+  mkTable(pane,{cols,items:regels,empty:"Nog geen regels. Klik ‘+ Regel’ om een calculatie toe te voegen.",onRow:r=>regelForm(p.id,r)});
+  // totalen
+  const tot=regels.reduce((s,r)=>{const cr=calcRegel(r);s.omzet+=cr.regelTotaal;s.kost+=cr.kostTotaal;return s;},{omzet:0,kost:0});
+  const box=el("div",{class:"calcbox",style:"margin-top:14px;max-width:360px;margin-left:auto"});
+  box.append(el("div",{class:"calcrow"},el("span",{},"Totale kostprijs"),el("b",{},eur(tot.kost))),el("div",{class:"calcrow"},el("span",{},"Winst"),el("b",{},eur(tot.omzet-tot.kost))),el("div",{class:"calcrow big"},el("span",{},"Projectwaarde"),el("b",{},eur(tot.omzet))));
+  pane.append(box);
+}
+function regelForm(pid,existing){
+  const p=projectOf(pid);
+  const matOpts=[{v:"",l:"— kies filament —"},...DATA.materialen.map(x=>({v:x.id,l:x.naam}))];
+  const prodOpts=[{v:"",l:"— (leeg / handmatig) —"},...DATA.producten.map(x=>({v:x.id,l:x.artikelnummer+" · "+x.naam}))];
+  const m=existing?{...existing}:{aantal:1,materiaalId:DATA.materialen[0]?.id||""};
+  const preview=el("div",{class:"calcbox"});
+  const recalc=v=>{const mat=materiaalOf(v.materiaalId);const r=calcRegel({aantal:v.aantal,meterMateriaal:v.meterMateriaal,printuren:v.printuren,ontwerpuren:v.ontwerpuren,eurPerMeterFrozen:mat?mat.eurPerMeter:0,verkoopprijs:v.verkoopprijs,eenmaligeKosten:v.eenmaligeKosten});preview.innerHTML="";const row=(l,val,cls="")=>el("div",{class:"calcrow "+cls},el("span",{},l),el("b",{},val));preview.append(el("div",{class:"section-t",style:"margin-top:0"},"Calculatie"),row("Materiaal ("+(mat?eur(mat.eurPerMeter)+"/m":"—")+")",eur(r.materiaalKosten)),row("Stroom",eur(r.stroomKosten)),row("Afschrijving",eur(r.afschrijving)),row("Ontwerp (eenmalig)",eur(r.ontwerpKosten)),row("Eenmalige kosten",eur(parseNum(v.eenmaligeKosten))),row("Kostprijs / stuk",eur(r.kostprijsPerStuk)),row("Adviesprijs / stuk",eur(r.adviesPerStuk)),row("Verkoop / stuk",eur(r.verkoopPerStuk)),row("Regeltotaal",eur(r.regelTotaal),"big"),row("Marge",num(r.marge,1)+" %"));};
+  const form=buildForm([
+    {key:"productId",label:"Uit bestaand product overnemen",type:"select",opts:prodOpts,onchange:(v,refs)=>{const pr=byId(DATA.producten,v.productId);if(pr){refs.naam.input.value=pr.naam;refs.omschrijving.input.value=pr.omschrijving||"";refs.materiaalId.input.value=pr.materiaalId||"";refs.meterMateriaal.input.value=pr.meterMateriaal||"";refs.printuren.input.value=pr.printuren||"";refs.ontwerpuren.input.value=pr.ontwerpuren||"";if(pr.verkoopprijs)refs.verkoopprijs.input.value=pr.verkoopprijs;recalc(getVals(refs));}}},
+    {key:"naam",label:"Productnaam",req:true,half:true},
+    {key:"materiaalId",label:"Filament",type:"select",opts:matOpts,half:true,onchange:v=>recalc(v)},
+    {key:"omschrijving",label:"Omschrijving",type:"textarea",rows:2},
+    {key:"meterMateriaal",label:"Meter mat.",type:"number",step:"0.01",half:true,cols:3,oninput:v=>recalc(v)},
+    {key:"printuren",label:"Printuren",type:"number",step:"0.1",half:true,cols:3,oninput:v=>recalc(v)},
+    {key:"ontwerpuren",label:"Ontwerpuren",type:"number",step:"0.1",half:true,cols:3,oninput:v=>recalc(v)},
+    {key:"aantal",label:"Aantal",type:"number",half:true,cols:3,oninput:v=>recalc(v)},
+    {key:"verkoopprijs",label:"Verkoop/st (leeg=advies)",type:"number",step:"0.01",half:true,cols:3,oninput:v=>recalc(v)},
+    {key:"eenmaligeKosten",label:"Eenmalige kosten (€)",type:"number",step:"0.01",half:true,cols:3,oninput:v=>recalc(v),hint:"instel/verzend"}
+  ],m);
+  recalc(getVals(form.__refs));
+  const body=el("div",{class:"grid g2",style:"align-items:start"},form,preview);
+  const btns=[el("button",{class:"btn ghost",onclick:closeModal},"Annuleren")];
+  if(existing)btns.push(el("button",{class:"btn danger",onclick:()=>{if(confirm("Regel verwijderen?")){DATA.projectRegels=DATA.projectRegels.filter(x=>x.id!==existing.id);setDirty();closeModal();render();toast("Regel verwijderd");}}},"Verwijderen"));
+  btns.push(el("button",{class:"btn pri",onclick:()=>{
+    if(!validate(form.__refs))return toast("Vul een productnaam in.","err");
+    const v=getVals(form.__refs);["meterMateriaal","printuren","ontwerpuren","aantal","verkoopprijs","eenmaligeKosten"].forEach(k=>v[k]=v[k]===""?"":parseNum(v[k]));
+    const mat=materiaalOf(v.materiaalId);v.eurPerMeterFrozen=mat?mat.eurPerMeter:0;
+    if(existing)Object.assign(existing,v);
+    else DATA.projectRegels.push({id:uid(),projectId:pid,...v});
+    log(existing?"Projectregel gewijzigd":"Projectregel toegevoegd","Project",p.projectnummer,p.projectnummer,v.naam);
+    setDirty();closeModal();render();toast("Regel opgeslagen");
+  }},existing?"Opslaan":"Toevoegen"));
+  openModal(existing?"Regel bewerken":"Nieuwe regel · "+p.projectnummer,body,btns,true);
+}
+</script>
+<script>
+/* ==========================================================================
+   DOCUMENT-PANES binnen project (offerte / pakbon / factuur)
+   ========================================================================== */
+function paneOffertes(pane,p){
+  pane.append(el("div",{style:"margin-bottom:12px"},el("button",{class:"btn pri",onclick:()=>maakOfferte(p)},"+ Offerte genereren uit regels")));
+  const offs=DATA.offertes.filter(o=>o.projectId===p.id).sort((a,b)=>(b.datum||"").localeCompare(a.datum||""));
+  const cols=[
+    {h:"Nummer",render:o=>`<b>${esc(o.nummer)}${o.revisie?" · R"+o.revisie:""}</b>`},
+    {h:"Datum",render:o=>fdate(o.datum)},
+    {h:"Geldig tot",render:o=>fdate(o.geldigTot)+(o.geldigTot<today()&&o.status==="Verzonden"?' <span class="pill warn">verlopen</span>':"")},
+    {h:"Bedrag",num:true,render:o=>`<b>${eur(offerteTotaal(o.id).totaal)}</b>`},
+    {h:"Status",render:o=>pill(o.status)},
+    {h:"Acties",render:o=>`<span style="display:flex;gap:6px"><button class="btn sm" data-a="pdf">PDF</button><button class="btn sm ghost" data-a="st">Status</button></span>`}
+  ];
+  mkTable(pane,{cols,items:offs,empty:"Nog geen offertes voor dit project.",onRow:o=>{}});
+  pane.querySelectorAll("tbody tr").forEach((tr,i)=>{const o=offs[i];if(!o)return;tr.querySelector('[data-a="pdf"]')?.addEventListener("click",e=>{e.stopPropagation();printDocument("offerte",o);});tr.querySelector('[data-a="st"]')?.addEventListener("click",e=>{e.stopPropagation();statusMenu(o,OFFERTE_STATUS,s=>{o.status=s;if(s==="Akkoord"&&!["Offerte akkoord","In productie"].includes(p.status))p.status="Offerte akkoord";log("Offertestatus","Offerte",o.nummer,p.projectnummer,"→ "+s);setDirty();render();});});});
+}
+function maakOfferte(p){
+  const regels=regelsUitProject(p.id);
+  if(!regels.length)return toast("Voeg eerst calculatieregels toe.","err");
+  const bestaand=DATA.offertes.filter(o=>o.projectId===p.id);
+  const revisie=bestaand.length; // 0 = eerste, daarna R1,R2...
+  bestaand.forEach(o=>{if(o.status!=="Akkoord"&&o.status!=="Verloren")o.status="Vervangen";});
+  const nummer=revisie===0?nextNum("offerte"):bestaand[0].nummer;
+  const o={id:uid(),nummer,revisie,projectId:p.id,klantId:p.klantId,datum:today(),geldigTot:addDays(today(),DATA.instellingen.offertegeldigheid),status:"Concept",btwPct:DATA.instellingen.kor?0:DATA.instellingen.btwStandaard};
+  DATA.offertes.push(o);regels.forEach(r=>DATA.offerteRegels.push({...r,offerteId:o.id}));
+  if(p.status==="Aanvraag")p.status="Offertefase";
+  log("Offerte gegenereerd","Offerte",o.nummer+(revisie?" R"+revisie:""),p.projectnummer,klantNaam(klantOf(p.klantId)));
+  setDirty();render();toast("Offerte "+o.nummer+(revisie?" · revisie R"+revisie:"")+" aangemaakt");
+}
+
+function panePakbonnen(pane,p){
+  pane.append(el("div",{style:"margin-bottom:12px"},el("button",{class:"btn pri",onclick:()=>maakPakbon(p)},"+ Pakbon / (deel)levering")));
+  // besteld/geleverd overzicht
+  const regels=regelsVanProject(p.id);
+  if(regels.length){
+    const ov=el("div",{class:"card",style:"margin-bottom:14px"});ov.append(el("div",{class:"section-t"},"Leverstatus per product"));
+    const cols=[{h:"Product",render:r=>esc(r.naam)},{h:"Besteld",num:true,render:r=>num(r.aantal,0)},{h:"Geleverd",num:true,render:r=>num(geleverd(p.id,r.naam),0)},{h:"Nog te leveren",num:true,render:r=>{const n=r.aantal-geleverd(p.id,r.naam);return `<b class="${n>0?'hl':''}">${num(n,0)}</b>`;}}];
+    mkTable(ov,{cols,items:regels});pane.append(ov);
+  }
+  const paks=DATA.pakbonnen.filter(o=>o.projectId===p.id).sort((a,b)=>(b.datum||"").localeCompare(a.datum||""));
+  const cols=[
+    {h:"Nummer",render:o=>`<b>${esc(o.nummer)}</b>`},{h:"Datum",render:o=>fdate(o.datum)},
+    {h:"Regels",num:true,render:o=>String(DATA.pakbonRegels.filter(x=>x.pakbonId===o.id).length)},
+    {h:"Aantal",num:true,render:o=>num(DATA.pakbonRegels.filter(x=>x.pakbonId===o.id).reduce((s,r)=>s+parseNum(r.geleverd),0),0)},
+    {h:"",render:()=>`<button class="btn sm" data-a="pdf">PDF</button>`}
+  ];
+  mkTable(pane,{cols,items:paks,empty:"Nog geen pakbonnen."});
+  pane.querySelectorAll("tbody tr").forEach((tr,i)=>{const o=paks[i];if(!o)return;tr.querySelector('[data-a="pdf"]')?.addEventListener("click",e=>{e.stopPropagation();printDocument("pakbon",o);});});
+}
+function geleverd(pid,naam){return DATA.pakbonRegels.filter(r=>{const pk=byId(DATA.pakbonnen,r.pakbonId);return pk&&pk.projectId===pid&&r.product===naam;}).reduce((s,r)=>s+parseNum(r.geleverd),0);}
+function maakPakbon(p){
+  const regels=regelsVanProject(p.id);
+  if(!regels.length)return toast("Geen regels om te leveren.","err");
+  const inputs={};
+  const body=el("div");
+  body.append(el("div",{class:"mini",style:"margin-bottom:12px"},"Vul in hoeveel je nu levert (deellevering mogelijk)."));
+  regels.forEach(r=>{const rest=r.aantal-geleverd(p.id,r.naam);const inp=el("input",{type:"number",value:Math.max(0,rest),style:"width:90px;background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:6px;color:var(--txt)"});inputs[r.id]={r,inp};body.append(el("div",{style:"display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)"},el("div",{style:"flex:1"},el("b",{},r.naam),el("div",{class:"mini"},"besteld "+num(r.aantal,0)+" · al geleverd "+num(geleverd(p.id,r.naam),0)+" · rest "+num(rest,0))),inp));});
+  const save=el("button",{class:"btn pri",onclick:()=>{
+    const pk={id:uid(),nummer:nextNum("pakbon"),projectId:p.id,klantId:p.klantId,datum:today(),leveradres:""};
+    let n=0;Object.values(inputs).forEach(({r,inp})=>{const g=parseNum(inp.value);if(g>0){DATA.pakbonRegels.push({id:uid(),pakbonId:pk.id,product:r.naam,omschrijving:r.omschrijving||"",materiaal:materiaalOf(r.materiaalId)?.naam||"",besteld:r.aantal,geleverd:g});n++;}});
+    if(!n){toast("Niets te leveren ingevuld.","err");return;}
+    DATA.pakbonnen.push(pk);
+    // status bijwerken
+    const alles=regels.every(r=>geleverd(p.id,r.naam)>=r.aantal);
+    p.status=alles?"Afgerond":"Deellevering";
+    log("Pakbon aangemaakt","Pakbon",pk.nummer,p.projectnummer,klantNaam(klantOf(p.klantId)));
+    setDirty();closeModal();render();toast("Pakbon "+pk.nummer+" aangemaakt");
+  }},"Pakbon aanmaken");
+  openModal("Nieuwe pakbon · "+p.projectnummer,body,[el("button",{class:"btn ghost",onclick:closeModal},"Annuleren"),save]);
+}
+
+function paneFacturen(pane,p){
+  const bar=el("div",{style:"margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap"});
+  bar.append(el("button",{class:"btn pri",onclick:()=>maakFactuur(p,"regels")},"+ Factuur (volledig)"),el("button",{class:"btn",onclick:()=>maakFactuur(p,"percentage")},"+ Deelfactuur (%)"));
+  const akkoord=DATA.offertes.filter(o=>o.projectId===p.id&&o.status==="Akkoord");
+  if(akkoord.length)bar.append(el("button",{class:"btn",onclick:()=>maakFactuur(p,"offerte",akkoord[0])},"+ Factuur uit offerte "+akkoord[0].nummer));
+  pane.append(bar);
+  const facs=DATA.facturen.filter(o=>o.projectId===p.id).sort((a,b)=>(b.datum||"").localeCompare(a.datum||""));
+  const cols=[
+    {h:"Nummer",render:f=>`<b>${esc(f.nummer)}</b>`},{h:"Datum",render:f=>fdate(f.datum)},
+    {h:"Vervalt",render:f=>fdate(f.vervaldatum)+(f.status==="Verzonden"&&f.vervaldatum<today()?' <span class="pill err">verlopen</span>':"")},
+    {h:"Bedrag",num:true,render:f=>`<b>${eur(factuurTotaal(f.id).totaal)}</b>`},
+    {h:"Status",render:f=>pill(f.status)},
+    {h:"Acties",render:()=>`<span style="display:flex;gap:6px"><button class="btn sm" data-a="pdf">PDF</button><button class="btn sm ghost" data-a="st">Status</button></span>`}
+  ];
+  mkTable(pane,{cols,items:facs,empty:"Nog geen facturen."});
+  pane.querySelectorAll("tbody tr").forEach((tr,i)=>{const f=facs[i];if(!f)return;tr.querySelector('[data-a="pdf"]')?.addEventListener("click",e=>{e.stopPropagation();printDocument("factuur",f);});tr.querySelector('[data-a="st"]')?.addEventListener("click",e=>{e.stopPropagation();statusMenu(f,FACTUUR_STATUS,s=>{f.status=s;log("Factuurstatus","Factuur",f.nummer,p.projectnummer,"→ "+s);setDirty();render();});});});
+}
+function maakFactuur(p,modus,offerte){
+  let regels;
+  if(modus==="offerte"&&offerte){regels=DATA.offerteRegels.filter(r=>r.offerteId===offerte.id).map(r=>({id:uid(),product:r.product,omschrijving:r.omschrijving,aantal:r.aantal,eenheid:r.eenheid,stukprijs:r.stukprijs,korting:r.korting}));}
+  else if(modus==="percentage"){const pct=parseNum(prompt("Welk percentage van de projectwaarde factureren?","50"));if(!pct)return;const w=projectWaarde(p.id);regels=[{id:uid(),product:"Deelfactuur "+num(pct,0)+"% — "+p.projectnaam,omschrijving:"Termijnfactuur",aantal:1,eenheid:"",stukprijs:w*pct/100,korting:0}];}
+  else{regels=regelsUitProject(p.id);}
+  if(!regels||!regels.length)return toast("Geen regels om te factureren.","err");
+  const f={id:uid(),nummer:nextNum("factuur"),projectId:p.id,klantId:p.klantId,datum:today(),vervaldatum:addDays(today(),klantOf(p.klantId)?.betaaltermijn||DATA.instellingen.betaaltermijn),status:"Concept",btwPct:DATA.instellingen.kor?0:DATA.instellingen.btwStandaard,basis:modus};
+  DATA.facturen.push(f);regels.forEach(r=>DATA.factuurRegels.push({...r,factuurId:f.id}));
+  log("Factuur aangemaakt","Factuur",f.nummer,p.projectnummer,klantNaam(klantOf(p.klantId))+" · "+eur(factuurTotaal(f.id).totaal));
+  setDirty();render();toast("Factuur "+f.nummer+" aangemaakt");
+}
+function statusMenu(doc,opts,cb){
+  const body=el("div");opts.forEach(s=>body.append(el("button",{class:"btn",style:"display:block;width:100%;margin-bottom:6px;text-align:left"+(s===doc.status?";border-color:var(--acc)":""),onclick:()=>{cb(s);closeModal();toast("Status: "+s);}},s)));
+  openModal("Status wijzigen",body,[el("button",{class:"btn ghost",onclick:closeModal},"Sluiten")]);
+}
+</script>
+<script>
+/* ==========================================================================
+   PDF / PRINT — professioneel document (3D4U-stijl) in nieuw venster
+   ========================================================================== */
+function printDocument(type,doc){
+  const s=DATA.instellingen, k=klantOf(doc.klantId), p=projectOf(doc.projectId);
+  let regels,totaal,titel,extra="";
+  if(type==="offerte"){regels=DATA.offerteRegels.filter(r=>r.offerteId===doc.id);totaal=offerteTotaal(doc.id);titel="OFFERTE";extra=`Offerte geldig tot: <b>${fdate(doc.geldigTot)}</b>`;}
+  else if(type==="factuur"){regels=DATA.factuurRegels.filter(r=>r.factuurId===doc.id);totaal=factuurTotaal(doc.id);titel="FACTUUR";extra=`Vervaldatum: <b>${fdate(doc.vervaldatum)}</b>`;}
+  else{regels=DATA.pakbonRegels.filter(r=>r.pakbonId===doc.id);titel="PAKBON";}
+  const bedrijfReg=[s.bedrijf,s.adres,[s.postcode,s.plaats].filter(Boolean).join(" "),s.email,s.telefoon].filter(Boolean);
+  const klantReg=k?[k.bedrijf,k.contactpersoon,k.adres,[k.postcode,k.plaats].filter(Boolean).join(" ")].filter(Boolean):["—"];
+  const voettekst=type==="offerte"?s.voettekstOfferte:type==="factuur"?s.voettekstFactuur:s.voettekstPakbon;
+  const fnaam=`${doc.nummer}${doc.revisie?"-R"+doc.revisie:""} - ${klantNaam(k)} - ${p?p.projectnaam:""}`.replace(/[\/\\:*?"<>|]/g,"");
+
+  let rowsHtml,totHtml="";
+  if(type==="pakbon"){
+    rowsHtml=regels.map(r=>`<tr><td class="c">${num(r.geleverd,0)}</td><td>${esc(r.product)}${r.omschrijving?`<div class="sub">${esc(r.omschrijving)}</div>`:""}</td><td>${esc(r.materiaal||"")}</td><td class="c">${num(r.besteld,0)}</td><td class="c">${num(r.besteld-geleverdTot(doc,r),0)}</td></tr>`).join("");
+  }else{
+    rowsHtml=regels.map(r=>{const rt=parseNum(r.aantal)*parseNum(r.stukprijs)*(1-parseNum(r.korting)/100);return `<tr><td class="c">${r.aantal?num(r.aantal,0):""}</td><td>${esc(r.product)}${r.omschrijving?`<div class="sub">${esc(r.omschrijving)}</div>`:""}</td><td class="r">${eur(r.stukprijs)}</td><td class="r">${eur(rt)}</td></tr>`;}).join("");
+    totHtml=`<table class="tot"><tr><td>Subtotaal</td><td class="r">${eur(totaal.subtotaal)}</td></tr>${s.kor?`<tr><td colspan="2" class="kor">${esc(s.korTekst)}</td></tr>`:`<tr><td>Btw ${num(doc.btwPct,0)}%</td><td class="r">${eur(totaal.btw)}</td></tr>`}<tr class="grand"><td>Totaal</td><td class="r">${eur(totaal.totaal)}</td></tr></table>`;
+  }
+  const headCols=type==="pakbon"?`<th class="c">Aantal</th><th>Beschrijving</th><th>Materiaal</th><th class="c">Besteld</th><th class="c">Restant</th>`:`<th class="c">Aantal</th><th>Beschrijving</th><th class="r">Per stuk</th><th class="r">Totaal</th>`;
+
+  const html=`<!DOCTYPE html><html lang="nl"><head><meta charset="utf-8"><title>${esc(fnaam)}</title>
+  <style>
+  @page{size:A4;margin:18mm 16mm}
+  *{box-sizing:border-box}
+  body{font:12px/1.5 'Segoe UI',Arial,sans-serif;color:#1a1a1a;margin:0}
+  .doc{max-width:800px;margin:0 auto}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #ff7a1a;padding-bottom:14px}
+  .logo{font-size:26px;font-weight:800}.logo span{color:#ff7a1a}
+  .logo .t{font-size:11px;letter-spacing:3px;color:#888;font-weight:600;text-transform:uppercase}
+  .docmeta{text-align:right}.docmeta .big{font-size:22px;font-weight:800;letter-spacing:2px;color:#ff7a1a}
+  .docmeta .nr{font-size:14px;font-weight:700;margin-top:2px}.docmeta .sub{color:#666;font-size:11px}
+  .addr{display:flex;justify-content:space-between;margin:22px 0}
+  .addr .block{font-size:12px}.addr .lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:4px}
+  .addr .block b{font-size:13px}
+  table.items{width:100%;border-collapse:collapse;margin-top:8px}
+  table.items th{background:#f4f5f7;text-align:left;padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#666;border-bottom:2px solid #ddd}
+  table.items td{padding:8px 10px;border-bottom:1px solid #eee;vertical-align:top}
+  table.items td.c,th.c{text-align:center}table.items td.r,th.r{text-align:right}
+  td .sub{color:#888;font-size:11px}
+  table.tot{margin-left:auto;margin-top:14px;width:280px;border-collapse:collapse}
+  table.tot td{padding:6px 10px}table.tot td.r{text-align:right;font-variant-numeric:tabular-nums}
+  table.tot tr.grand td{border-top:2px solid #ff7a1a;font-weight:800;font-size:15px}
+  table.tot .kor{font-size:10px;color:#888;font-style:italic}
+  .foot{margin-top:40px;border-top:1px solid #eee;padding-top:14px;color:#555;font-size:11px}
+  .pay{margin-top:14px;font-size:11px;color:#333}.pay b{color:#000}
+  .thanks{margin-top:10px;font-style:italic;color:#666}
+  @media print{.noprint{display:none}}
+  .noprint{position:fixed;top:10px;right:10px;background:#ff7a1a;color:#160c02;border:none;padding:10px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}
+  </style></head><body>
+  <button class="noprint" onclick="window.print()">⤓ Opslaan als PDF / Printen</button>
+  <div class="doc">
+    <div class="top">
+      <div><div class="logo">3D4U<span>·</span></div><div class="t">Printservice</div></div>
+      <div class="docmeta"><div class="big">${titel}</div><div class="nr">${esc(doc.nummer)}${doc.revisie?" · Revisie R"+doc.revisie:""}</div>
+        <div class="sub">${p?esc(p.projectnummer)+" — "+esc(p.projectnaam):""}</div>
+        <div class="sub">Datum: ${fdate(doc.datum)}</div>${extra?`<div class="sub">${extra}</div>`:""}</div>
+    </div>
+    <div class="addr">
+      <div class="block"><div class="lbl">${type==="factuur"?"Factuur voor":type==="pakbon"?"Leveren aan":"Offerte voor"}</div>${klantReg.map((l,i)=>i===1?`<b>${esc(l)}</b>`:esc(l)).join("<br>")}</div>
+      <div class="block" style="text-align:right"><div class="lbl">Van</div><b>${esc(s.bedrijf)}</b><br>${bedrijfReg.slice(1).map(esc).join("<br>")}<br>KvK ${esc(s.kvk||"")}</div>
+    </div>
+    <table class="items"><thead><tr>${headCols}</tr></thead><tbody>${rowsHtml||`<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">Geen regels</td></tr>`}</tbody></table>
+    ${totHtml}
+    ${type==="factuur"?`<div class="pay">Gelieve te betalen vóór <b>${fdate(doc.vervaldatum)}</b> o.v.v. factuurnummer <b>${esc(doc.nummer)}</b>.<br>IBAN <b>${esc(s.iban||"")}</b> t.n.v. <b>${esc(s.tnv||"")}</b></div>`:""}
+    <div class="foot">${p&&p.externeNotitie?`<div style="margin-bottom:8px">${esc(p.externeNotitie)}</div>`:""}<div class="thanks">${esc(voettekst||"")}</div></div>
+  </div>
+  <script>document.title=${JSON.stringify(fnaam)};<\/script>
+  </body></html>`;
+  const w=window.open("","_blank");
+  if(!w){toast("Sta pop-ups toe om PDF te openen.","err");return;}
+  w.document.open();w.document.write(html);w.document.close();
+  log(titel.toLowerCase()+" PDF geopend",titel,doc.nummer,p?p.projectnummer:"","");
+}
+function geleverdTot(pakbon,regel){/* restant t/m deze pakbon */const pid=pakbon.projectId;const upto=pakbon.datum;let g=0;DATA.pakbonRegels.forEach(r=>{const pk=byId(DATA.pakbonnen,r.pakbonId);if(pk&&pk.projectId===pid&&r.product===regel.product&&(pk.datum<upto||pk.id===pakbon.id))g+=parseNum(r.geleverd);});return g;}
+</script>
+<script>
+/* ==========================================================================
+   LIJSTEN: offertes / pakbonnen / facturen (alle projecten)
+   ========================================================================== */
+function viewOffertes(c){
+  const bar=el("div",{class:"toolbar"});const search=el("div",{class:"search"},el("span",{class:"ic"},"⌕"),el("input",{placeholder:"Zoek offerte / klant / project…"}));bar.append(search);c.append(bar);
+  const cols=[
+    {h:"Nummer",render:o=>`<b>${esc(o.nummer)}${o.revisie?" R"+o.revisie:""}</b>`},
+    {h:"Datum",render:o=>fdate(o.datum)},
+    {h:"Klant",render:o=>esc(klantNaam(klantOf(o.klantId)))},
+    {h:"Project",render:o=>{const p=projectOf(o.projectId);return p?`<button class="linkbtn" onclick="event.stopPropagation();go('project','${p.id}')">${esc(p.projectnaam)}</button>`:"—";}},
+    {h:"Geldig tot",render:o=>fdate(o.geldigTot)},
+    {h:"Bedrag",num:true,render:o=>`<b>${eur(offerteTotaal(o.id).totaal)}</b>`},
+    {h:"Status",render:o=>pill(o.status)},
+    {h:"",render:()=>`<button class="btn sm" data-a="pdf">PDF</button>`}
+  ];
+  const items=()=>[...DATA.offertes].sort((a,b)=>(b.datum||"").localeCompare(a.datum||""));
+  const t=mkTable(c,{cols,items:items(),empty:"Nog geen offertes. Maak ze aan vanuit een project.",onRow:o=>{const p=projectOf(o.projectId);if(p)go("project",p.id);}});
+  bindPdf(c,items(),"offerte");
+  search.querySelector("input").addEventListener("input",e=>{const q=e.target.value.toLowerCase();const l=items().filter(o=>[o.nummer,klantNaam(klantOf(o.klantId)),projectOf(o.projectId)?.projectnaam].join(" ").toLowerCase().includes(q));t.draw(l);bindPdf(c,l,"offerte");});
+}
+function viewPakbonnen(c){
+  const cols=[
+    {h:"Nummer",render:o=>`<b>${esc(o.nummer)}</b>`},{h:"Datum",render:o=>fdate(o.datum)},
+    {h:"Klant",render:o=>esc(klantNaam(klantOf(o.klantId)))},
+    {h:"Project",render:o=>esc(projectOf(o.projectId)?.projectnaam||"—")},
+    {h:"Aantal",num:true,render:o=>num(DATA.pakbonRegels.filter(x=>x.pakbonId===o.id).reduce((s,r)=>s+parseNum(r.geleverd),0),0)},
+    {h:"",render:()=>`<button class="btn sm" data-a="pdf">PDF</button>`}
+  ];
+  const items=[...DATA.pakbonnen].sort((a,b)=>(b.datum||"").localeCompare(a.datum||""));
+  mkTable(c,{cols,items,empty:"Nog geen pakbonnen.",onRow:o=>{const p=projectOf(o.projectId);if(p)go("project",p.id);}});
+  bindPdf(c,items,"pakbon");
+}
+function viewFacturen(c){
+  const bar=el("div",{class:"toolbar"});const search=el("div",{class:"search"},el("span",{class:"ic"},"⌕"),el("input",{placeholder:"Zoek factuur / klant…"}));bar.append(search);c.append(bar);
+  const cols=[
+    {h:"Nummer",render:f=>`<b>${esc(f.nummer)}</b>`},{h:"Datum",render:f=>fdate(f.datum)},
+    {h:"Klant",render:f=>esc(klantNaam(klantOf(f.klantId)))},
+    {h:"Project",render:f=>esc(projectOf(f.projectId)?.projectnaam||"—")},
+    {h:"Vervalt",render:f=>fdate(f.vervaldatum)+(f.status==="Verzonden"&&f.vervaldatum<today()?' <span class="pill err">!</span>':"")},
+    {h:"Bedrag",num:true,render:f=>`<b>${eur(factuurTotaal(f.id).totaal)}</b>`},
+    {h:"Status",render:f=>pill(f.status)},
+    {h:"",render:()=>`<button class="btn sm" data-a="pdf">PDF</button>`}
+  ];
+  const items=()=>[...DATA.facturen].sort((a,b)=>(b.datum||"").localeCompare(a.datum||""));
+  const t=mkTable(c,{cols,items:items(),empty:"Nog geen facturen.",onRow:f=>{const p=projectOf(f.projectId);if(p)go("project",p.id);}});
+  bindPdf(c,items(),"factuur");
+  search.querySelector("input").addEventListener("input",e=>{const q=e.target.value.toLowerCase();const l=items().filter(f=>[f.nummer,klantNaam(klantOf(f.klantId))].join(" ").toLowerCase().includes(q));t.draw(l);bindPdf(c,l,"factuur");});
+}
+function bindPdf(c,items,type){c.querySelectorAll("tbody tr").forEach((tr,i)=>{const d=items[i];if(!d)return;tr.querySelector('[data-a="pdf"]')?.addEventListener("click",e=>{e.stopPropagation();printDocument(type,d);});});}
+
+/* ==========================================================================
+   INSTELLINGEN
+   ========================================================================== */
+function viewInstellingen(c){
+  const s=DATA.instellingen;
+  const form=buildForm([
+    {section:"Bedrijfsgegevens"},
+    {key:"bedrijf",label:"Bedrijfsnaam",half:true},{key:"tnv",label:"Ten name van (IBAN)",half:true},
+    {key:"adres",label:"Adres",half:true},{key:"website",label:"Website",half:true},
+    {key:"postcode",label:"Postcode",half:true,cols:2},{key:"plaats",label:"Plaats",half:true,cols:2},
+    {key:"email",label:"E-mail",half:true},{key:"telefoon",label:"Telefoon",half:true},
+    {key:"kvk",label:"KvK-nummer",half:true,cols:3},{key:"btwnummer",label:"Btw-nummer",half:true,cols:3},{key:"iban",label:"IBAN",half:true,cols:3},
+    {section:"Btw & termijnen"},
+    {key:"kor",label:"Kleineondernemersregeling (btw-vrijgesteld)",type:"checkbox"},
+    {key:"btwStandaard",label:"Standaard btw % (als geen KOR)",type:"number",half:true,cols:3},
+    {key:"betaaltermijn",label:"Betaaltermijn (dagen)",type:"number",half:true,cols:3},
+    {key:"offertegeldigheid",label:"Offertegeldigheid (dagen)",type:"number",half:true,cols:3},
+    {section:"Calculatie-parameters (printmodel)"},
+    {key:"printerKosten",label:"Printerkosten (€)",type:"number",half:true,cols:3},
+    {key:"afschrijvingJaar",label:"Afschrijving (jaar)",type:"number",half:true,cols:3},
+    {key:"urenPerJaar",label:"Draaiuren per jaar",type:"number",half:true,cols:3},
+    {key:"energieWatt",label:"Verbruik (Watt)",type:"number",half:true,cols:3},
+    {key:"energiePrijs",label:"Stroomprijs (€/kWh)",type:"number",step:"0.01",half:true,cols:3},
+    {key:"ontwerpTarief",label:"Ontwerptarief (€/uur)",type:"number",half:true,cols:3},
+    {key:"marge",label:"Marge (×)",type:"number",step:"0.1",half:true,cols:2},
+    {key:"adviesFactor",label:"Extra adviesfactor (×)",type:"number",step:"0.1",half:true,cols:2},
+    {section:"Documentteksten"},
+    {key:"korTekst",label:"KOR-tekst op documenten",type:"textarea",rows:2},
+    {key:"voettekstOfferte",label:"Voettekst offerte",type:"textarea",rows:2},
+    {key:"voettekstFactuur",label:"Voettekst factuur",type:"textarea",rows:2},
+    {key:"voettekstPakbon",label:"Voettekst pakbon",type:"textarea",rows:2}
+  ],s);
+  const derived=el("div",{class:"okbox",style:"margin-top:14px"});
+  const updDerived=()=>{const v=getVals(form.__refs);const l=(parseNum(v.urenPerJaar)||1)*(parseNum(v.afschrijvingJaar)||1);const af=l?parseNum(v.printerKosten)/l:0;const st=(parseNum(v.energieWatt)/1000)*parseNum(v.energiePrijs);derived.innerHTML=`Afgeleid: afschrijving <b>${eur(af)}/uur</b> · stroom <b>${eur(st)}/uur</b> · levensduur <b>${num(l,0)} uur</b>`;};
+  ["printerKosten","afschrijvingJaar","urenPerJaar","energieWatt","energiePrijs"].forEach(k=>form.__refs[k].input.addEventListener("input",updDerived));updDerived();
+  const card=el("div",{class:"card"});card.append(form,derived);c.append(card);
+  actionBtn("Opslaan",()=>{const v=getVals(form.__refs);["btwStandaard","betaaltermijn","offertegeldigheid","printerKosten","afschrijvingJaar","urenPerJaar","energieWatt","energiePrijs","ontwerpTarief","marge","adviesFactor"].forEach(k=>v[k]=parseNum(v[k]));Object.assign(s,v);log("Instellingen gewijzigd","Systeem","","","");setDirty();toast("Instellingen opgeslagen");render();},"btn pri");
+}
+</script>
+<script>
+/* ==========================================================================
+   BACK-UP & DATAVEILIGHEID
+   ========================================================================== */
+function downloadJSON(obj,naam){const blob=new Blob([JSON.stringify(obj,null,0)],{type:"application/json"});const a=el("a",{href:URL.createObjectURL(blob),download:naam});document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);}
+function exportBackup(){const stamp=new Date().toISOString().slice(0,16).replace(/[:T]/g,"-");downloadJSON(DATA,`3D4U-ERP-backup_${stamp}.json`);toast("Back-up gedownload");log("Back-up gedownload","Systeem","","","");}
+function importBackup(file){const r=new FileReader();r.onload=async()=>{try{const d=JSON.parse(r.result);if(!d.klanten||!d.instellingen)throw new Error("Geen geldig ERP-bestand");await makeAutoBackup("voor-import");DATA=d;await persist();toast("Back-up teruggezet");render();}catch(e){toast("Import mislukt: "+e.message,"err");}};r.readAsText(file);}
+async function bindFile(){
+  if(!window.showSaveFilePicker){toast("Bestandskoppeling wordt niet ondersteund in deze browser (gebruik Chrome/Edge).","warn");return;}
+  try{fileHandle=await window.showSaveFilePicker({suggestedName:"3D4U-ERP-data.json",types:[{description:"ERP data",accept:{"application/json":[".json"]}}]});await persist();toast("Databestand gekoppeld — elke wijziging wordt hierin opgeslagen.");render();}catch(e){}
+}
+async function loadFromFile(){
+  if(!window.showOpenFilePicker){toast("Niet ondersteund in deze browser.","warn");return;}
+  try{const [h]=await window.showOpenFilePicker({types:[{accept:{"application/json":[".json"]}}]});const f=await h.getFile();const d=JSON.parse(await f.text());if(!d.klanten)throw new Error("Ongeldig");await makeAutoBackup("voor-laden");DATA=d;fileHandle=h;await persist();toast("Data geladen en gekoppeld.");render();}catch(e){if(e.message)toast("Laden mislukt: "+e.message,"err");}
+}
+function viewBackup(c){
+  const fsOk=!!window.showSaveFilePicker;
+  const status=el("div",{class:"card"});
+  status.append(el("div",{class:"section-t"},"Waar staat mijn data?"),
+    el("div",{class:"okbox",style:"margin-bottom:10px"},"✔ Live opgeslagen in de lokale browserdatabase (IndexedDB) van deze computer. Data blijft bewaard als je het bestand sluit en later weer opent."),
+    el("div",{class:fileHandle?"okbox":"warnbox"},fileHandle?"✔ Gekoppeld aan een databestand — elke wijziging wordt direct óók naar dat bestand geschreven (ideaal op USB / synced map).":"⚠ Nog geen databestand gekoppeld. Koppel er één voor een tweede, draagbare kopie (USB of OneDrive/Google Drive = ‘online’)."));
+  c.append(status);
+
+  const actions=el("div",{class:"card",style:"margin-top:16px"});
+  actions.append(el("div",{class:"section-t"},"Handmatige back-up"));
+  const btns=el("div",{style:"display:flex;gap:10px;flex-wrap:wrap"});
+  btns.append(el("button",{class:"btn pri",onclick:exportBackup},"⤓ Back-up downloaden (.json)"));
+  const imp=el("input",{type:"file",accept:".json",style:"display:none",onchange:e=>{if(e.target.files[0])importBackup(e.target.files[0]);}});
+  btns.append(el("button",{class:"btn",onclick:()=>imp.click()},"↺ Back-up terugzetten"),imp);
+  if(fsOk){btns.append(el("button",{class:"btn",onclick:bindFile},"🔗 Databestand koppelen (live opslaan)"),el("button",{class:"btn ghost",onclick:loadFromFile},"📂 Data uit bestand laden"));}
+  actions.append(btns);
+  actions.append(el("div",{class:"mini",style:"margin-top:10px"},"Tip voor ‘online’ zonder server: koppel het databestand in een map van OneDrive, Google Drive of Dropbox. Dan synct je ERP-data automatisch naar de cloud en tussen apparaten, zonder abonnement of database-installatie."));
+  c.append(actions);
+
+  // automatische back-ups
+  const auto=el("div",{class:"card",style:"margin-top:16px"});
+  auto.append(el("div",{class:"section-t"},"Automatische back-ups (laatste 12)"));
+  idbKeys(BK).then(async keys=>{
+    keys=keys.sort().reverse();
+    if(!keys.length){auto.append(el("div",{class:"mini"},"Nog geen automatische back-ups. Deze worden gemaakt bij openen, sluiten en vóór grote acties."));return;}
+    const wrap=el("div");
+    for(const key of keys){const bk=await idbGet(BK,key);const row=el("div",{style:"display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)"},el("div",{style:"flex:1"},el("b",{},new Date(bk.ts).toLocaleString("nl-NL")),el("span",{class:"mini"}," · "+(bk.reason||"auto"))),el("button",{class:"btn sm",onclick:async()=>{if(confirm("Deze back-up terugzetten? Huidige data wordt eerst geback-upt.")){await makeAutoBackup("voor-restore");DATA=bk.data;await persist();toast("Back-up teruggezet");render();}}},"Terugzetten"));wrap.append(row);}
+    auto.append(wrap);
+  });
+  c.append(auto);
+  actionBtn("Nu back-uppen",()=>{makeAutoBackup("handmatig").then(()=>{toast("Interne back-up gemaakt");render();});},"btn ghost");
+}
+
+/* ==========================================================================
+   LOGBOEK
+   ========================================================================== */
+function viewLogboek(c){
+  c.append(el("div",{class:"mini",style:"margin-bottom:12px"},DATA.logboek.length+" acties geregistreerd."));
+  const cols=[
+    {h:"Datum/tijd",render:l=>new Date(l.ts).toLocaleString("nl-NL")},
+    {h:"Actie",render:l=>`<b>${esc(l.actie)}</b>`},
+    {h:"Type",render:l=>l.type?`<span class="tag">${esc(l.type)}</span>`:""},
+    {h:"Nummer",render:l=>esc(l.nummer||"")},
+    {h:"Project",render:l=>esc(l.project||"")},
+    {h:"Omschrijving",render:l=>esc(l.oms||"")}
+  ];
+  mkTable(c,{cols,items:DATA.logboek.slice(0,300),empty:"Nog geen acties."});
+}
+
+/* ==========================================================================
+   BOOTSTRAP
+   ========================================================================== */
+async function boot(){
+  try{await openIDB();}catch(e){alert("Kon lokale database niet openen. Gebruik een moderne browser (Chrome/Edge/Firefox).");return;}
+  let saved=null;try{saved=await idbGet(STORE,KEY);}catch(e){}
+  if(saved&&saved.klanten){DATA=saved;}
+  else{DATA=seedIfEmpty(defaultData());}
+  // migratie-veiligheid: ontbrekende arrays aanvullen
+  const base=defaultData();for(const k in base){if(DATA[k]===undefined)DATA[k]=base[k];}
+  for(const k in base.instellingen){if(DATA.instellingen[k]===undefined)DATA.instellingen[k]=base.instellingen[k];}
+  for(const k in base.nummerreeksen){if(DATA.nummerreeksen[k]===undefined)DATA.nummerreeksen[k]=base.nummerreeksen[k];}
+  await persist();
+  await makeAutoBackup("open");
+  render();
+  toast("3D4U ERP geladen · "+DATA.klanten.length+" klanten, "+DATA.projecten.length+" projecten");
+}
+window.addEventListener("beforeunload",e=>{try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(_){}});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&dirty)persist();});
+// probeer persistente opslag te reserveren (voorkomt automatische wissing)
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
+
+// ---- mobiel uitschuifmenu ----
+$("#menuBtn").addEventListener("click",toggleDrawer);
+$("#sidebarClose").addEventListener("click",closeDrawer);
+$("#navBackdrop").addEventListener("click",closeDrawer);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(activeModal)closeModal();else closeDrawer();}});
+
+boot();
+</script>
+
+
+</body></html>
